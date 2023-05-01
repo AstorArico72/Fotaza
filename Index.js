@@ -1,5 +1,5 @@
 const Express = require ("express");
-const OtrasRutas = require("./RutasMiscelaneas.js");
+const OtrasRutas = require("./Rutas/RutasMiscelaneas.js");
 const APP = Express ();
 //Pendiente.
 // const RutasFotaza = require ("./Rutas/Fotaza.js");
