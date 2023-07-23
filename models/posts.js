@@ -18,7 +18,9 @@ module.exports = (sequelize, DataTypes) => {
     Usuario: DataTypes.INTEGER,
     Texto_Post: DataTypes.STRING,
     Título_Post: DataTypes.STRING,
-    URL_Medios: DataTypes.STRING
+    URL_Medios: DataTypes.STRING,
+    createdAt: DataTypes.DATE,
+    updatedAt: DataTypes.DATE
   }, {
     sequelize,
     modelName: 'Posts',
