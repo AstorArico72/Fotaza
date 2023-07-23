@@ -11,7 +11,7 @@ ROUTER.get ("/", (_req, res, next)=> {
 });
 
 ROUTER.get ("*", (req, res, next)=> {
-    let ErrorPug = Pug.renderFile ("./Publico/MensajeError.pug", {
+    let ErrorPug = Pug.renderFile ("./Views/MensajeError.pug", {
         NoError: "404",
         MensajeError: "No se encontró nada en " + req.url
     });
@@ -20,7 +20,7 @@ ROUTER.get ("*", (req, res, next)=> {
 });
 
 ROUTER.post ("*", (req, res, next)=> {
-    let ErrorPug = Pug.renderFile ("./Publico/MensajeError.pug", {
+    let ErrorPug = Pug.renderFile ("./Views/MensajeError.pug", {
         NoError: "404",
         MensajeError: "No se encontró nada en " + req.url
     });
@@ -29,7 +29,7 @@ ROUTER.post ("*", (req, res, next)=> {
 });
 
 ROUTER.all ("*", (req, res, next)=> {
-    let ErrorPug = Pug.renderFile ("./Publico/MensajeError.pug", {
+    let ErrorPug = Pug.renderFile ("./Views/MensajeError.pug", {
         NoError: "405",
         MensajeError: "No se pudo manejar el pedido a " + req.url + ".<br>Los únicos métodos soportados son GET y POST."
     });

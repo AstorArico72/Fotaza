@@ -6,17 +6,17 @@ const Pug = require ("pug");
 exports.Autenticador = async (req, res, next) => {
     let TokenAcceso = req.cookies ["AccesoFotaza"];
     if (!TokenAcceso) {
-        let ErrorPug = Pug.renderFile ("./Publico/MensajeError.pug", {
+        let ErrorPug = Pug.renderFile ("./Views/MensajeError.pug", {
             NoError: "401",
             MensajeError: "No está autenticado. <a href='./Ingresar'>¿Ingresar?</a>"
         });
         res.status (401).send (ErrorPug);
     } else {
         try {
-            const decoded = JWT.verify(TokenAcceso, "Webmaster-Approved");
+            const decoded = JWT.verify(TokenAcceso, "Ésto no es Instagram");
             req.user = decoded;
         } catch (err) {
-            let ErrorPug = Pug.renderFile ("./Publico/MensajeError.pug", {
+            let ErrorPug = Pug.renderFile ("./Views/MensajeError.pug", {
                 NoError: "500",
                 MensajeError: "Error del servidor con la autenticación. <a href='./Ingresar'>¿Ingresar de nuevo?</a>"
             });
@@ -53,7 +53,7 @@ exports.LogIn = (async (req, res, next) => {
     });
 
     if (FoundUser.length == 0){
-        let ErrorPug = Pug.renderFile ("./Publico/MensajeError.pug", {
+        let ErrorPug = Pug.renderFile ("./Views/MensajeError.pug", {
             NoError: "401",
             MensajeError: "Usuario o contraseña incorrectos. <a href='./Ingresar'>¿Ingresar de nuevo?</a>"
         });
@@ -66,14 +66,14 @@ exports.LogIn = (async (req, res, next) => {
                 "Usuario": UserName,
                 "Contraseña": UserPassword,
                 "ID_Usuario": FoundUser [0]["ID"]
-            }, "Webmaster-Approved", { //Necesito otra forma de manejar los "secretos" 
+            }, "Ésto no es Instagram", { //Necesito otra forma de manejar los "secretos" 
                 expiresIn: "1h"
             });
     
             res.cookie ("AccesoFotaza", Token, CookieOptions);
             res.redirect ("/Posts");
         } else {
-            let ErrorPug = Pug.renderFile ("./Publico/MensajeError.pug", {
+            let ErrorPug = Pug.renderFile ("./Views/MensajeError.pug", {
                 NoError: "401",
                 MensajeError: "Usuario o contraseña incorrectos. <a href='./Ingresar'>¿Ingresar de nuevo?</a>"
             });
@@ -97,7 +97,7 @@ exports.NewUser = (async (req, res, next) => {
         });
         res.redirect (301, "../");
     } catch (error) {
-        let ErrorPug = Pug.renderFile ("./Publico/MensajeError.pug", {
+        let ErrorPug = Pug.renderFile ("./Views/MensajeError.pug", {
             NoError: "500",
             MensajeError: "Error con la creación de la cuenta: <br>" + error
         });

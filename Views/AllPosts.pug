@@ -1,15 +1,14 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fotaza</title>
-    <link rel="stylesheet" href="/CSS" type="Text/CSS"/>
-    <link rel="icon" type="image/x-icon" href="/favicon"/>
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-nav navbar-toggleable-sm navbar-light bg-light border-bottom box-shadow mb-3">
+doctype html
+html(lang="es")
+    head
+        meta(charset="UTF-8")
+        meta(http-equiv="X-UA-Compatible", content="IE=edge")
+        meta(name="viewport", content="width=device-width, initial-scale=1.0")
+        link(rel="stylesheet", href="/CSS", type="Text/CSS")
+        title #{PostTitle} - Fotaza
+        link(rel="icon", href="/favicon", type="image/x-icon")
+    body
+        <nav class="navbar navbar-expand-lg navbar-nav navbar-toggleable-sm navbar-light bg-light border-bottom box-shadow mb-3">
         <div class="container-fluid">
             <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                 <ul class="navbar-nav flex-grow-1 align-items-center">
@@ -35,12 +34,9 @@
             </div>
         </div>
         </nav>
-    <h1> Fotaza </h1>
-    <h2>[En progreso]</h2>
-    <p>
-        Trabajo hecho por Astor Aricó.
-    </p>
-    <a href="./Usuario/Ingresar">Ingresar a Fotaza</a> <br>
-    <a href="./Posts">Explorar el contenido</a>
-</body>
-</html>
+        - for (var i=0; i < PostList.length; i++)
+            div
+                h3= PostList[i].Título_Post
+                h4= "Por " + OPsList [i] + ", el " + PostList[i].createdAt
+                br
+                a(href=`./Posts/Ver/${PostList[i].ID}`) Ver

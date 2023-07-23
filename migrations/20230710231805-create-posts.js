@@ -24,12 +24,8 @@ module.exports = {
       URL_Medios: {
         type: Sequelize.STRING
       },
-      createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE
-      },
-      updatedAt: {
-        allowNull: false,
+      FechaPost: {
+        allowNull: true,
         type: Sequelize.DATE
       }
     });

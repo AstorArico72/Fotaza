@@ -17,10 +17,11 @@ module.exports = (sequelize, DataTypes) => {
     ID: DataTypes.INTEGER,
     Nombre_Usuario: DataTypes.STRING,
     Contraseña: DataTypes.STRING,
-    Fecha_Creación: DataTypes.DATE
+    createdAt: DataTypes.DATE,
+    updatedAt: DataTypes.DATE
   }, {
     sequelize,
-    modelName: 'Usuarios',
+    modelName: 'Usuarios'
   });
   return Usuarios;
 };
