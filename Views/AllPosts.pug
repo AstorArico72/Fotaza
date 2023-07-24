@@ -5,38 +5,34 @@ html(lang="es")
         meta(http-equiv="X-UA-Compatible", content="IE=edge")
         meta(name="viewport", content="width=device-width, initial-scale=1.0")
         link(rel="stylesheet", href="/CSS", type="Text/CSS")
-        title #{PostTitle} - Fotaza
+        title Fotaza
         link(rel="icon", href="/favicon", type="image/x-icon")
     body
-        <nav class="navbar navbar-expand-lg navbar-nav navbar-toggleable-sm navbar-light bg-light border-bottom box-shadow mb-3">
-        <div class="container-fluid">
-            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                <ul class="navbar-nav flex-grow-1 align-items-center">
-                    <li class="nav-item">
-                        <h2> <a class="nav-link text-dark" href="/Home">Fotaza</a> </h2>
-                    </li>
-                    <li class="nav-item">
-                        <button class="btn btn-primary">
-                            <a class="nav-link text-light" href="/Usuario/Ingresar">Iniciar Sesión</a>
-                        </button>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-danger" href="/Usuario/Salir">Salir</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/Posts">Subidas</a>
-                    </li>
-                    <li class="nav-item">
-                        <!-- A implementar -->
-                        <a class="nav-link" href="/Usuario">Tu perfil</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-        </nav>
-        - for (var i=0; i < PostList.length; i++)
-            div
-                h3= PostList[i].Título_Post
-                h4= "Por " + OPsList [i] + ", el " + PostList[i].createdAt
-                br
-                a(href=`./Posts/Ver/${PostList[i].ID}`) Ver
+        nav.navbar.navbar-expand-lg.navbar-nav.navbar-toggleable-sm.navbar-light.bg-light.border-bottom.box-shadow.mb-3
+            div.container-fluid
+                div.navbar-collapse.collapse.d-sm-inline-flex.justify-content-between
+                    ul.navbar-nav.flex-grow-1.align-items-center
+                        li.nav-item
+                            h2
+                                a.nav-link.text-dark(href="/Home") Fotaza
+                        - if (IdUsuarioConectado == "NULL")
+                            li.nav-item
+                                button.btn.btn-primary
+                                    a.nav-link.text-light(href="/Usuario/Ingresar") Iniciar Sesión
+                        - else
+                            li.nav-item
+                                a.nav-link.text-success(href=`/Usuario/${IdUsuarioConectado}`)
+                                    h4 #{UsuarioConectado}
+                        li.nav-item
+                            a.nav-link.text-danger(href="/Usuario/Salir")
+                                h5 Salir
+                        li.nav-item
+                            a.nav-link(href="/Posts")
+                                h5 Subidas
+        section.bg-medium
+        each Upload in UploadList
+            div.bg-light
+                h3
+                    a(href=`./Posts/Ver/${Upload ["id"]}`) #{Upload ["Título_Post"]}
+                h4 Subido el #{Upload ["createdAt"]} por&nbsp;
+                    a(href=`/Usuarios/${Upload ["Numero_OP"]}`) #{Upload ["Nombre_OP"]}

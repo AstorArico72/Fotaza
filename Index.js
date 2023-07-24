@@ -12,7 +12,6 @@ APP.use (CookieParser ());
 APP.use (Express.urlencoded ());
 APP.use ("/CSS", Express.static (__dirname + "/Publico/Sketchy-Bootswatch.css"));
 APP.use ('/favicon', Express.static (__dirname + "/Publico/expressjs_logo_icon_169185.ico"));
-APP.use ('/Home', Express.static (__dirname + "/Publico/Home.html"));
 
 //Parece que no puedo manejar los archivos estáticos desde el controlador correspondiente.
 APP.use ('/Usuario/Ingresar', Express.static (__dirname + "/Publico/Login.html"));

@@ -6,6 +6,7 @@ const Auth = require ("../Controladores/Auth.js");
 
 ROUTER.post ('/NuevaCuenta', Auth.NewUser);
 ROUTER.post ("/SubmitLogin", Auth.LogIn);
+ROUTER.get ("/Salir", Auth.LogOut);
 
 /**
 function Nuevo (Usuario) {

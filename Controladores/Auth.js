@@ -6,11 +6,7 @@ const Pug = require ("pug");
 exports.Autenticador = async (req, res, next) => {
     let TokenAcceso = req.cookies ["AccesoFotaza"];
     if (!TokenAcceso) {
-        let ErrorPug = Pug.renderFile ("./Views/MensajeError.pug", {
-            NoError: "401",
-            MensajeError: "No está autenticado. <a href='./Ingresar'>¿Ingresar?</a>"
-        });
-        res.status (401).send (ErrorPug);
+        req.user = undefined;
     } else {
         try {
             const decoded = JWT.verify(TokenAcceso, "Ésto no es Instagram");
@@ -62,7 +58,6 @@ exports.LogIn = (async (req, res, next) => {
         if (await BCrypt.compare (UserPassword, FoundUser [0]["Contraseña"]) == true) {
             //Ésto genera el token
             const Token = JWT.sign ({
-                //Paso la contraseña encriptada en el token junto con el nombre de usuario
                 "Usuario": UserName,
                 "Contraseña": UserPassword,
                 "ID_Usuario": FoundUser [0]["ID"]

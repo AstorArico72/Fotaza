@@ -1,6 +1,25 @@
 const Express = require ("express");
 const ROUTER = Express.Router ();
 const Pug = require ("pug");
+const { Autenticador } = require("../Controladores/Auth");
+
+ROUTER.get ("/Home", Autenticador, (req, res, next)=> {
+    let OnlineUser;
+    let OnlineUserId;
+
+    if (typeof req.user !== "undefined") {
+        OnlineUser = req.user ["Usuario"];
+        OnlineUserId = req.user ["ID_Usuario"];
+    } else {
+        OnlineUser = "NIL";
+        OnlineUserId = "NULL";
+    }
+    let Home = Pug.renderFile ("./Views/Home.pug", {
+        UsuarioConectado: OnlineUser,
+        IdUsuarioConectado: OnlineUserId
+    });
+    res.send (Home);
+});
 
 ROUTER.get ("/home", (_req, res, next)=> {
     res.redirect (301, "/Home");

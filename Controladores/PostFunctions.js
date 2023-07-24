@@ -12,19 +12,34 @@ exports.VerSubida = async (req, res, _next) => {
     let ContenidoPost = PostSeleccionado [0].Texto_Post;
     let TituloPost = PostSeleccionado [0].Título_Post;
     let FechaSubida = PostSeleccionado [0].createdAt;
+    let IdAutor = PostSeleccionado [0].Usuario;
     let AutorPost = await Usuarios.findAll ({
         where: {
-            ID: PostSeleccionado [0].Usuario
+            id: PostSeleccionado [0].Usuario
         }
     });
     let NombreOP = AutorPost [0].Nombre_Usuario;
 
+    let OnlineUser;
+    let OnlineUserId;
+
+    if (typeof req.user !== "undefined") {
+        OnlineUser = req.user ["Usuario"];
+        OnlineUserId = req.user ["ID_Usuario"];
+    } else {
+        OnlineUser = "NIL";
+        OnlineUserId = "NULL";
+    }
+
     let FullPost = Pug.renderFile ("./Views/Post.pug", {
+        UsuarioConectado: OnlineUser,
+        IdUsuarioConectado: OnlineUserId,
         PostTitle: TituloPost,
         PostContent: ContenidoPost,
         OriginalPoster: NombreOP,
         PostNumber: NumeroSubida,
-        PostDate: FechaSubida
+        PostDate: FechaSubida,
+        OP_ID: IdAutor
     });
     res.send (FullPost);
 }
@@ -34,25 +49,43 @@ exports.TodosLosPosts = async (req, res) => {
         attributes: [
             "Título_Post",
             "createdAt",
-            "Usuario"
+            "Usuario",
+            "id"
         ],
         order: [
             ["createdAt", "DESC"]
         ]
     });
-    let ListaAutores = [];
-    for (let x=0; x< ListaSubidas.length; x++) {
-        let AutorPost = await Usuarios.findAll ({
+
+    let ListaPosts = [];
+    for (let i= 0; i< ListaSubidas.length; i++) {
+        let OP = await Usuarios.findAll ({
             where: {
-                ID: ListaSubidas [x].Usuario
+                id: ListaSubidas [i].Usuario
             }
         });
-        ListaAutores.push (AutorPost [0].Nombre_Usuario);
+        let Numero_OP = OP [0].id;
+        let Nombre_OP = OP [0].Nombre_Usuario;
+        ListaSubidas [i].Numero_OP= Numero_OP;
+        ListaSubidas [i].Nombre_OP= Nombre_OP;
+        ListaPosts.push (ListaSubidas [i]);
+    }
+
+    let OnlineUser;
+    let OnlineUserId;
+
+    if (typeof req.user !== "undefined") {
+        OnlineUser = req.user ["Usuario"];
+        OnlineUserId = req.user ["ID_Usuario"];
+    } else {
+        OnlineUser = "NIL";
+        OnlineUserId = "NULL";
     }
 
     let Listado = Pug.renderFile ("./Views/AllPosts.pug", {
-        PostList: ListaSubidas,
-        OPsList: ListaAutores
+        UploadList: ListaPosts,
+        UsuarioConectado: OnlineUser,
+        IdUsuarioConectado: OnlineUserId
     });
     res.send (Listado);
 }
