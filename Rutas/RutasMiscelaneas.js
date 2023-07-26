@@ -2,23 +2,10 @@ const Express = require ("express");
 const ROUTER = Express.Router ();
 const Pug = require ("pug");
 const { Autenticador } = require("../Controladores/Auth");
+const OtrasFunciones = require("../Publico/OtrasFunciones.js");
 
 ROUTER.get ("/Home", Autenticador, (req, res, next)=> {
-    let OnlineUser;
-    let OnlineUserId;
-
-    if (typeof req.user !== "undefined") {
-        OnlineUser = req.user ["Usuario"];
-        OnlineUserId = req.user ["ID_Usuario"];
-    } else {
-        OnlineUser = "NIL";
-        OnlineUserId = "NULL";
-    }
-    let Home = Pug.renderFile ("./Views/Home.pug", {
-        UsuarioConectado: OnlineUser,
-        IdUsuarioConectado: OnlineUserId
-    });
-    res.send (Home);
+    OtrasFunciones.CargarPaginaPugBasica (req, res, "./Views/Home.pug");
 });
 
 ROUTER.get ("/home", (_req, res, next)=> {
@@ -30,30 +17,15 @@ ROUTER.get ("/", (_req, res, next)=> {
 });
 
 ROUTER.get ("*", (req, res, next)=> {
-    let ErrorPug = Pug.renderFile ("./Views/MensajeError.pug", {
-        NoError: "404",
-        MensajeError: "No se encontró nada en " + req.url
-    });
-    res.status (404).send (ErrorPug);
-    console.log ("Llegó pedido para " + req.url + " pero no se pudo manejar.");
+    OtrasFunciones.PaginaErrorPug (req, res, 404, "No se encontró nada en " + req.url);
 });
 
 ROUTER.post ("*", (req, res, next)=> {
-    let ErrorPug = Pug.renderFile ("./Views/MensajeError.pug", {
-        NoError: "404",
-        MensajeError: "No se encontró nada en " + req.url
-    });
-    res.status (404).send (ErrorPug);
-    console.log ("Llegó pedido para " + req.url + " pero no se pudo manejar.");
+    OtrasFunciones.PaginaErrorPug (req, res, 404, "No se encontró nada en " + req.url);
 });
 
 ROUTER.all ("*", (req, res, next)=> {
-    let ErrorPug = Pug.renderFile ("./Views/MensajeError.pug", {
-        NoError: "405",
-        MensajeError: "No se pudo manejar el pedido a " + req.url + ".<br>Los únicos métodos soportados son GET y POST."
-    });
-    res.status (405).send (ErrorPug);
-    console.log ("No se pudo manejar el pedido a " + req.url + " por usar un método no soportado.");
+    OtrasFunciones.PaginaErrorPug (req, res, 405, "No se pudo manejar el pedido a " + req.url + ".<br>Los únicos métodos soportados son GET y POST.");
 });
 
 module.exports = ROUTER;

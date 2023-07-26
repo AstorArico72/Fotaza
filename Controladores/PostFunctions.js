@@ -1,6 +1,10 @@
 const JWT = require ("jsonwebtoken");
 const {Usuarios, Posts} = require ("../models");
 const Pug = require ("pug");
+const OtrasFunciones = require ("../Publico/OtrasFunciones.js");
+const Formidable = require ("formidable");
+const Path = require ("path");
+const FS = require ("fs");
 
 exports.VerSubida = async (req, res, _next) => {
     let NumeroSubida = req.params.ID;
@@ -88,4 +92,48 @@ exports.TodosLosPosts = async (req, res) => {
         IdUsuarioConectado: OnlineUserId
     });
     res.send (Listado);
+}
+
+exports.PaginaSubida = (req, res, _next) => {
+    OtrasFunciones.CargarPaginaPugSegura (req, res, "./Views/NuevoPost.pug");
+}
+
+exports.NuevoPost = async (req, res) => {
+    let DirectorioSubida = Path.join (__dirname, "../Medios");
+    let DatosSubidos = new Formidable.IncomingForm ();
+    DatosSubidos.uploadDir = DirectorioSubida;
+    DatosSubidos.multiples = false;
+    DatosSubidos.maxFileSize = 10485760; // 10 MiB.
+    var UrlMedios;
+    var CamposFormulario = {};
+    try {
+        DatosSubidos.parse (req, async (_error, fields, files)=> {
+            console.log (fields);
+            console.log (files);
+
+            let Foto = files.PostMedia [0];
+            if (Foto.size > DatosSubidos.maxFileSize) {
+                OtrasFunciones.PaginaErrorPug (req, res, 400, "El archivo es muy grande. (Límite: 10 MiB)");
+            }
+            let NombreTruncado = encodeURIComponent(Foto.originalFilename.replace(/\s/g, "-"));
+            let Ahora = new Date ();
+            let NombreArchivo = Ahora.getFullYear () + "-" + Ahora.getMonth () + "-" + Ahora.getDay () + "-" + Ahora.getHours () + "-" + Ahora.getMinutes () + "-" + Ahora.getSeconds () + "-" + NombreTruncado;
+            FS.renameSync (Foto.filepath, Path.join (DirectorioSubida, NombreArchivo));
+            UrlMedios = "/Medios/" + NombreArchivo;
+            CamposFormulario.TituloPost = fields.TituloPost [0];
+            CamposFormulario.SubidoPor = parseInt(fields.SubidoPor [0]);
+            CamposFormulario.TextoPost = fields.TextoPost [0];
+        }).then (() => {
+            Posts.create ({
+                Título_Post: CamposFormulario.TituloPost,
+                Usuario: CamposFormulario.SubidoPor,
+                Texto_Post: CamposFormulario.TextoPost,
+                URL_Medios: UrlMedios
+            });
+        });
+    } catch (error) {
+        OtrasFunciones.PaginaErrorPug (req, res, 500, "Error con la subida:<br>" + error);
+    } finally {
+        res.redirect ("..");
+    }
 }

@@ -5,7 +5,7 @@ html(lang="es")
         meta(http-equiv="X-UA-Compatible", content="IE=edge")
         meta(name="viewport", content="width=device-width, initial-scale=1.0")
         link(rel="stylesheet", href="/CSS", type="Text/CSS")
-        title #{PostTitle} - Fotaza
+        title Nueva subida - Fotaza
         link(rel="icon", href="/favicon", type="image/x-icon")
     body
         nav.navbar.navbar-expand-lg.navbar-nav.navbar-toggleable-sm.navbar-light.bg-light.border-bottom.box-shadow.mb-3
@@ -26,16 +26,18 @@ html(lang="es")
                             li.nav-item
                                 a.nav-link.text-danger(href="/Usuario/Salir")
                                     h5 Salir
-                            li.nav-item
-                                a.nav-link(href="/Posts/Subir")
-                                    h5 Subir Post
                         li.nav-item
                             a.nav-link(href="/Posts")
                                 h5 Subidas
-        h1 #{PostTitle}
-        h2 Subido el #{PostDate} por&nbsp;
-            a(href=`/Usuarios/${OP_ID}`) #{OriginalPoster}
-        h3 Subida ##{PostNumber}
+        h1 Nueva subida
+        h2 Por #{UsuarioConectado}
         br
-        div #{PostContent}
-        a(href="http://127.0.0.1:8001") Página principal
+        div.align-items-center.text-center
+            form(action="/Posts/Nuevo", method="post", enctype="multipart/form-data")
+                input.input-group-text.fw-bold.input-group-lg(type="text", name="TituloPost", placeholder="Título")
+                input(type="hidden", name="SubidoPor", value=`${IdUsuarioConectado}`)
+                textarea.form-control(name="TextoPost", cols="50", rows="10", placeholder="Texto del post")
+                label(for="Foto") Foto &#40;Máximo 10 MiB&#41;
+                input.form-control#Foto(type="file", name="PostMedia")
+                button.btn.btn-success(type="submit")
+                    b ¡Subir!

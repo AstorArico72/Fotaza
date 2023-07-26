@@ -4,11 +4,15 @@ const APP = Express ();
 const RutasUsuario = require ("./Rutas/Usuario.js");
 const RutasSubidas = require ("./Rutas/Posts.js");
 const CookieParser = require ("cookie-parser");
+const BodyParser = require ("body-parser");
 const path = require ("path");
 
 APP.set ("view engine", "pug");
 APP.set ("views", path.join (__dirname, "/Views"));
 APP.use (CookieParser ());
+APP.use (BodyParser.urlencoded ({
+    extended: true
+}));
 APP.use (Express.urlencoded ());
 APP.use ("/CSS", Express.static (__dirname + "/Publico/Sketchy-Bootswatch.css"));
 APP.use ('/favicon', Express.static (__dirname + "/Publico/expressjs_logo_icon_169185.ico"));

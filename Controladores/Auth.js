@@ -1,6 +1,7 @@
 const BCrypt = require ("bcrypt");
 const JWT = require ("jsonwebtoken");
 const {Usuarios} = require ("../models");
+const {OtrasFunciones} = require ("../Publico/OtrasFunciones.js")
 const Pug = require ("pug");
 
 exports.Autenticador = async (req, res, next) => {
@@ -12,11 +13,7 @@ exports.Autenticador = async (req, res, next) => {
             const decoded = JWT.verify(TokenAcceso, "Ésto no es Instagram");
             req.user = decoded;
         } catch (err) {
-            let ErrorPug = Pug.renderFile ("./Views/MensajeError.pug", {
-                NoError: "500",
-                MensajeError: "Error del servidor con la autenticación. <a href='./Ingresar'>¿Ingresar de nuevo?</a>"
-            });
-            res.status (500).send (ErrorPug);
+            OtrasFunciones.PaginaErrorPug (req, res, 500, "Error del servidor con la autenticación. <a href='./Ingresar'>¿Ingresar de nuevo?</a>");
         }
     }
     next ();
@@ -49,11 +46,7 @@ exports.LogIn = (async (req, res, next) => {
     });
 
     if (FoundUser.length == 0){
-        let ErrorPug = Pug.renderFile ("./Views/MensajeError.pug", {
-            NoError: "401",
-            MensajeError: "Usuario o contraseña incorrectos. <a href='./Ingresar'>¿Ingresar de nuevo?</a>"
-        });
-        res.status (401).send (ErrorPug);
+        OtrasFunciones.PaginaErrorPug (req, res, 401, "Usuario o contraseña incorrectos. <a href='./Ingresar'>¿Ingresar de nuevo?</a>");
     } else {
         if (await BCrypt.compare (UserPassword, FoundUser [0]["Contraseña"]) == true) {
             //Ésto genera el token
@@ -68,11 +61,7 @@ exports.LogIn = (async (req, res, next) => {
             res.cookie ("AccesoFotaza", Token, CookieOptions);
             res.redirect ("/Posts");
         } else {
-            let ErrorPug = Pug.renderFile ("./Views/MensajeError.pug", {
-                NoError: "401",
-                MensajeError: "Usuario o contraseña incorrectos. <a href='./Ingresar'>¿Ingresar de nuevo?</a>"
-            });
-            res.status (401).send (ErrorPug);
+            OtrasFunciones.PaginaErrorPug (req, res, 401, "Usuario o contraseña incorrectos. <a href='./Ingresar'>¿Ingresar de nuevo?</a>");
         }
     }
 });
@@ -92,10 +81,6 @@ exports.NewUser = (async (req, res, next) => {
         });
         res.redirect (301, "../");
     } catch (error) {
-        let ErrorPug = Pug.renderFile ("./Views/MensajeError.pug", {
-            NoError: "500",
-            MensajeError: "Error con la creación de la cuenta: <br>" + error
-        });
-        res.status (500).send (ErrorPug);
+        OtrasFunciones.PaginaErrorPug (req, res, 500, "Error con la creación de la cuenta: <br>" + error);
     }
 });
