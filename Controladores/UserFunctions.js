@@ -1,8 +1,7 @@
 const BCrypt = require ("bcrypt");
 const JWT = require ("jsonwebtoken");
 const {Usuarios} = require ("../models");
-const {OtrasFunciones} = require ("../Publico/OtrasFunciones.js")
-const Pug = require ("pug");
+const {OtrasFunciones} = require ("../Publico/OtrasFunciones.js");
 
 exports.Autenticador = async (req, res, next) => {
     let TokenAcceso = req.cookies ["AccesoFotaza"];
@@ -13,7 +12,7 @@ exports.Autenticador = async (req, res, next) => {
             const decoded = JWT.verify(TokenAcceso, "Ésto no es Instagram");
             req.user = decoded;
         } catch (err) {
-            OtrasFunciones.PaginaErrorPug (req, res, 500, "Error del servidor con la autenticación. <a href='./Ingresar'>¿Ingresar de nuevo?</a>");
+            OtrasFunciones.PaginaErrorPug (res, 500, "Error del servidor con la autenticación. <a href='./Ingresar'>¿Ingresar de nuevo?</a>");
         }
     }
     next ();
@@ -46,14 +45,14 @@ exports.LogIn = (async (req, res, next) => {
     });
 
     if (FoundUser.length == 0){
-        OtrasFunciones.PaginaErrorPug (req, res, 401, "Usuario o contraseña incorrectos. <a href='./Ingresar'>¿Ingresar de nuevo?</a>");
+        OtrasFunciones.PaginaErrorPug (res, 401, "Usuario o contraseña incorrectos. <a href='./Ingresar'>¿Ingresar de nuevo?</a>");
     } else {
         if (await BCrypt.compare (UserPassword, FoundUser [0]["Contraseña"]) == true) {
             //Ésto genera el token
             const Token = JWT.sign ({
                 "Usuario": UserName,
                 "Contraseña": UserPassword,
-                "ID_Usuario": FoundUser [0]["ID"]
+                "ID_Usuario": parseInt (FoundUser [0]["ID"])
             }, "Ésto no es Instagram", { //Necesito otra forma de manejar los "secretos" 
                 expiresIn: "1h"
             });
@@ -61,7 +60,7 @@ exports.LogIn = (async (req, res, next) => {
             res.cookie ("AccesoFotaza", Token, CookieOptions);
             res.redirect ("/Posts");
         } else {
-            OtrasFunciones.PaginaErrorPug (req, res, 401, "Usuario o contraseña incorrectos. <a href='./Ingresar'>¿Ingresar de nuevo?</a>");
+            OtrasFunciones.PaginaErrorPug (res, 401, "Usuario o contraseña incorrectos. <a href='./Ingresar'>¿Ingresar de nuevo?</a>");
         }
     }
 });
@@ -81,6 +80,6 @@ exports.NewUser = (async (req, res, next) => {
         });
         res.redirect (301, "../");
     } catch (error) {
-        OtrasFunciones.PaginaErrorPug (req, res, 500, "Error con la creación de la cuenta: <br>" + error);
+        OtrasFunciones.PaginaErrorPug (res, 500, "Error con la creación de la cuenta: <br>" + error);
     }
 });

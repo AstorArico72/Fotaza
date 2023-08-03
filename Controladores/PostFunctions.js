@@ -13,39 +13,50 @@ exports.VerSubida = async (req, res, _next) => {
             ID: NumeroSubida
         }
     });
-    let ContenidoPost = PostSeleccionado [0].Texto_Post;
-    let TituloPost = PostSeleccionado [0].Título_Post;
-    let FechaSubida = PostSeleccionado [0].createdAt;
-    let IdAutor = PostSeleccionado [0].Usuario;
-    let AutorPost = await Usuarios.findAll ({
-        where: {
-            id: PostSeleccionado [0].Usuario
+    if (PostSeleccionado.length != 0) {
+        let Foto;
+        if (PostSeleccionado [0].URL_Medios != null || PostSeleccionado [0].URL_Medios != undefined) {
+            Foto = PostSeleccionado [0].URL_Medios;
+        } else {
+            Foto = "/Medios/null";
         }
-    });
-    let NombreOP = AutorPost [0].Nombre_Usuario;
+        let ContenidoPost = PostSeleccionado [0].Texto_Post;
+        let TituloPost = PostSeleccionado [0].Título_Post;
+        let FechaSubida = PostSeleccionado [0].createdAt;
+        let IdAutor = PostSeleccionado [0].Usuario;
+        let AutorPost = await Usuarios.findAll ({
+            where: {
+                id: PostSeleccionado [0].Usuario
+            }
+        });
+        let NombreOP = AutorPost [0].Nombre_Usuario;
 
-    let OnlineUser;
-    let OnlineUserId;
+        let OnlineUser;
+        let OnlineUserId;
 
-    if (typeof req.user !== "undefined") {
-        OnlineUser = req.user ["Usuario"];
-        OnlineUserId = req.user ["ID_Usuario"];
+        if (typeof req.user !== "undefined") {
+            OnlineUser = req.user ["Usuario"];
+            OnlineUserId = req.user ["ID_Usuario"];
+        } else {
+            OnlineUser = "NIL";
+            OnlineUserId = "NULL";
+        }
+
+        let FullPost = Pug.renderFile ("./Views/Post.pug", {
+            UsuarioConectado: OnlineUser,
+            IdUsuarioConectado: OnlineUserId,
+            PostTitle: TituloPost,
+            PostContent: ContenidoPost,
+            OriginalPoster: NombreOP,
+            PostNumber: NumeroSubida,
+            PostDate: FechaSubida,
+            OP_ID: IdAutor,
+            UrlImagen: Foto
+        });
+        res.send (FullPost);
     } else {
-        OnlineUser = "NIL";
-        OnlineUserId = "NULL";
+        OtrasFunciones.PaginaErrorPug (res, 404, "No se encontró ése post.")
     }
-
-    let FullPost = Pug.renderFile ("./Views/Post.pug", {
-        UsuarioConectado: OnlineUser,
-        IdUsuarioConectado: OnlineUserId,
-        PostTitle: TituloPost,
-        PostContent: ContenidoPost,
-        OriginalPoster: NombreOP,
-        PostNumber: NumeroSubida,
-        PostDate: FechaSubida,
-        OP_ID: IdAutor
-    });
-    res.send (FullPost);
 }
 
 exports.TodosLosPosts = async (req, res) => {
@@ -54,7 +65,7 @@ exports.TodosLosPosts = async (req, res) => {
             "Título_Post",
             "createdAt",
             "Usuario",
-            "id"
+            "ID"
         ],
         order: [
             ["createdAt", "DESC"]
@@ -101,39 +112,48 @@ exports.PaginaSubida = (req, res, _next) => {
 exports.NuevoPost = async (req, res) => {
     let DirectorioSubida = Path.join (__dirname, "../Medios");
     let DatosSubidos = new Formidable.IncomingForm ();
+    DatosSubidos.allowEmptyFiles = true;
     DatosSubidos.uploadDir = DirectorioSubida;
     DatosSubidos.multiples = false;
     DatosSubidos.maxFileSize = 10485760; // 10 MiB.
-    var UrlMedios;
-    var CamposFormulario = {};
-    try {
-        DatosSubidos.parse (req, async (_error, fields, files)=> {
-            console.log (fields);
-            console.log (files);
-
-            let Foto = files.PostMedia [0];
-            if (Foto.size > DatosSubidos.maxFileSize) {
-                OtrasFunciones.PaginaErrorPug (req, res, 400, "El archivo es muy grande. (Límite: 10 MiB)");
+    var UrlMedios = null;
+    var CamposFormulario = {
+        TituloPost: "",
+        SubidoPor: null,
+        TextoPost: ""
+    };
+    let SubirDatos = new Promise ((resolve, reject) => {
+        DatosSubidos.parse (req, (_error, fields, files)=> {
+            CamposFormulario ["TituloPost"] = fields.TituloPost [0];
+            CamposFormulario ["SubidoPor"] = fields.SubidoPor [0];
+            CamposFormulario ["TextoPost"] = fields.TextoPost [0];
+            if (typeof (files.PostMedia) != "undefined") {
+                let Foto = files.PostMedia [0];
+                if (Foto.size > DatosSubidos.maxFileSize) {
+                    OtrasFunciones.PaginaErrorPug (res, 400, "El archivo es muy grande. (Límite: 10 MiB)");
+                }
+                let NombreTruncado = encodeURIComponent(Foto.originalFilename.replace(/\s/g, "-"));
+                let Ahora = new Date ();
+                let NombreArchivo = Ahora.getFullYear () + "-" + Ahora.getMonth () + "-" + Ahora.getDay () + "-" + Ahora.getHours () + "-" + Ahora.getMinutes () + "-" + Ahora.getSeconds () + "-" + NombreTruncado;
+                FS.renameSync (Foto.filepath, Path.join (DirectorioSubida, NombreArchivo));
+                UrlMedios = "/Medios/" + NombreArchivo;
             }
-            let NombreTruncado = encodeURIComponent(Foto.originalFilename.replace(/\s/g, "-"));
-            let Ahora = new Date ();
-            let NombreArchivo = Ahora.getFullYear () + "-" + Ahora.getMonth () + "-" + Ahora.getDay () + "-" + Ahora.getHours () + "-" + Ahora.getMinutes () + "-" + Ahora.getSeconds () + "-" + NombreTruncado;
-            FS.renameSync (Foto.filepath, Path.join (DirectorioSubida, NombreArchivo));
-            UrlMedios = "/Medios/" + NombreArchivo;
-            CamposFormulario.TituloPost = fields.TituloPost [0];
-            CamposFormulario.SubidoPor = parseInt(fields.SubidoPor [0]);
-            CamposFormulario.TextoPost = fields.TextoPost [0];
-        }).then (() => {
+            resolve (CamposFormulario);
+        });
+    });
+    try {
+        SubirDatos.then ((data)=> {
+            console.log (data);
             Posts.create ({
-                Título_Post: CamposFormulario.TituloPost,
-                Usuario: CamposFormulario.SubidoPor,
-                Texto_Post: CamposFormulario.TextoPost,
+                Título_Post: data ["TituloPost"],
+                Usuario: data ["SubidoPor"],
+                Texto_Post: data ["TextoPost"],
                 URL_Medios: UrlMedios
             });
-        });
+        }).then (()=> {
+            res.redirect ("..");
+        })
     } catch (error) {
-        OtrasFunciones.PaginaErrorPug (req, res, 500, "Error con la subida:<br>" + error);
-    } finally {
-        res.redirect ("..");
+        OtrasFunciones.PaginaErrorPug (res, 500, "Error con la subida:<br>" + error);
     }
 }

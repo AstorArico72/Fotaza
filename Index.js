@@ -14,9 +14,10 @@ APP.use (BodyParser.urlencoded ({
     extended: true
 }));
 APP.use (Express.urlencoded ());
+APP.use (Express.static (path.join (__dirname, "Medios")));
 APP.use ("/CSS", Express.static (__dirname + "/Publico/Sketchy-Bootswatch.css"));
 APP.use ('/favicon', Express.static (__dirname + "/Publico/expressjs_logo_icon_169185.ico"));
-
+APP.use ("/Medios", Express.static (__dirname + "/Medios"));
 //Parece que no puedo manejar los archivos estáticos desde el controlador correspondiente.
 APP.use ('/Usuario/Ingresar', Express.static (__dirname + "/Publico/Login.html"));
 APP.use ('/Usuario/Nuevo', Express.static (__dirname + "/Publico/NuevoUsuario.html"));

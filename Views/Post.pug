@@ -37,5 +37,10 @@ html(lang="es")
             a(href=`/Usuarios/${OP_ID}`) #{OriginalPoster}
         h3 Subida ##{PostNumber}
         br
-        div #{PostContent}
+        div!= PostContent
+            br
+            br
+        - if (UrlImagen !="/Medios/null")
+            img(src=`${UrlImagen}`, alt=`Imagen del post #${PostNumber}`)
+            br
         a(href="http://127.0.0.1:8001") Página principal

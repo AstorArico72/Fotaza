@@ -14,13 +14,32 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Posts.init({
-    ID: DataTypes.INTEGER,
-    Usuario: DataTypes.INTEGER,
+    ID: {
+      type: DataTypes.INTEGER,
+      primaryKey: true
+    },
+    Usuario: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Usuarios',
+        key: 'ID'
+      }
+    },
     Texto_Post: DataTypes.STRING,
     Título_Post: DataTypes.STRING,
-    URL_Medios: DataTypes.STRING,
-    createdAt: DataTypes.DATE,
-    updatedAt: DataTypes.DATE
+    URL_Medios: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      defaultValue: "NULL"
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: true
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      allowNull: true
+    }
   }, {
     sequelize,
     modelName: 'Posts',

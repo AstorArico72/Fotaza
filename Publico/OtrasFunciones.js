@@ -1,4 +1,6 @@
 const Pug = require ("pug");
+const FS = require ("fs");
+const Path = require ("path");
 
 function CargarPaginaPugSegura (req, res, ArchivoPug) {
     let OnlineUser;
@@ -9,7 +11,7 @@ function CargarPaginaPugSegura (req, res, ArchivoPug) {
         OnlineUser = req.user ["Usuario"];
         OnlineUserId = req.user ["ID_Usuario"];
     } else {
-        PaginaErrorPug (req, res, 401, "No estás autenticado. <a href='./Ingresar'>¿Ingresar?</a>");
+        PaginaErrorPug (res, 401, "No estás autenticado. <a href='./Ingresar'>¿Ingresar?</a>");
     }
 
     try {
@@ -19,7 +21,7 @@ function CargarPaginaPugSegura (req, res, ArchivoPug) {
         });
         res.status (200).send (Pagina);
     } catch (Exception) {
-        PaginaErrorPug (req, res, 500, Exception);
+        PaginaErrorPug (res, 500, Exception);
     }
 }
 
@@ -44,11 +46,11 @@ function CargarPaginaPugBasica (req, res, ArchivoPug) {
         });
         res.status (200).send (Pagina);
     } catch (Exception) {
-        PaginaErrorPug (req, res, 500, Exception);
+        PaginaErrorPug (res, 500, Exception);
     }
 }
 
-function PaginaErrorPug (req, res, EstadoHTTP, Excepción) {
+function PaginaErrorPug (res, EstadoHTTP, Excepción) {
     let Pagina;
     Pagina = Pug.renderFile ("./Views/MensajeError.pug", {
         NoError: EstadoHTTP,
@@ -60,3 +62,4 @@ function PaginaErrorPug (req, res, EstadoHTTP, Excepción) {
 exports.PaginaErrorPug = PaginaErrorPug;
 exports.CargarPaginaPugBasica = CargarPaginaPugBasica;
 exports.CargarPaginaPugSegura = CargarPaginaPugSegura;
+//exports.CargarArchivoEstático = CargarArchivoEstático;

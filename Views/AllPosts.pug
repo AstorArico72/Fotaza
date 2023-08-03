@@ -36,6 +36,6 @@ html(lang="es")
         each Upload in UploadList
             div.bg-light
                 h3
-                    a(href=`./Posts/Ver/${Upload ["id"]}`) #{Upload ["Título_Post"]}
+                    a(href=`./Posts/Ver/${Upload ["ID"]}`) #{Upload ["Título_Post"]}
                 h4 Subido el #{Upload ["createdAt"]} por&nbsp;
                     a(href=`/Usuarios/${Upload ["Numero_OP"]}`) #{Upload ["Nombre_OP"]}
