@@ -2,7 +2,7 @@ const Express = require ("express");
 const ROUTER = Express.Router ();
 const Pug = require ("pug");
 const { Autenticador } = require("../Controladores/UserFunctions");
-const OtrasFunciones = require("../Publico/OtrasFunciones.js");
+var OtrasFunciones = require("../Controladores/OtrasFunciones.js");
 
 ROUTER.get ("/Home", Autenticador, (req, res, next)=> {
     OtrasFunciones.CargarPaginaPugBasica (req, res, "./Views/Home.pug");

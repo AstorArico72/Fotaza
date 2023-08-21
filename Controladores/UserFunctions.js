@@ -1,7 +1,7 @@
 const BCrypt = require ("bcrypt");
 const JWT = require ("jsonwebtoken");
 const {Usuarios} = require ("../models");
-const {OtrasFunciones} = require ("../Publico/OtrasFunciones.js");
+var OtrasFunciones = require ("./OtrasFunciones.js");
 
 exports.Autenticador = async (req, res, next) => {
     let TokenAcceso = req.cookies ["AccesoFotaza"];
@@ -73,13 +73,23 @@ exports.NewUser = (async (req, res, next) => {
     //Ésto encripta la contraseña
     const salt = await BCrypt.genSalt(10);
     const NewPassword = await BCrypt.hash(UserPassword, salt);
-    try {
-        Usuarios.create ({
-            Nombre_Usuario: UserName,
-            Contraseña: NewPassword
-        });
-        res.redirect (301, "../");
-    } catch (error) {
-        OtrasFunciones.PaginaErrorPug (res, 500, "Error con la creación de la cuenta: <br>" + error);
+    let Duplicado = await Usuarios.findAll ({
+        where: {
+            Nombre_Usuario: UserName
+        }
+    });
+    if (Duplicado.length > 0) {
+        OtrasFunciones.PaginaErrorPug (res, 400, "Ése nombre de usuario ya existe, intenta otro.");
+        return;
+    } else {
+        try {
+            Usuarios.create ({
+                Nombre_Usuario: UserName,
+                Contraseña: NewPassword
+            });
+            res.redirect (301, "../");
+        } catch (error) {
+            OtrasFunciones.PaginaErrorPug (res, 500, "Error con la creación de la cuenta: <br>" + error);
+        }
     }
 });

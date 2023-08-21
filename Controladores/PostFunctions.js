@@ -1,7 +1,7 @@
 const JWT = require ("jsonwebtoken");
 const {Usuarios, Posts} = require ("../models");
 const Pug = require ("pug");
-const OtrasFunciones = require ("../Publico/OtrasFunciones.js");
+var OtrasFunciones = require ("./OtrasFunciones.js");
 const Formidable = require ("formidable");
 const Path = require ("path");
 const FS = require ("fs");
