@@ -55,7 +55,8 @@ exports.VerSubida = async (req, res, _next) => {
         });
         res.send (FullPost);
     } else {
-        OtrasFunciones.PaginaErrorPug (res, 404, "No se encontró ése post.")
+        OtrasFunciones.PaginaErrorPug (res, 404, "No se encontró ése post.");
+        return;
     }
 }
 
@@ -131,6 +132,7 @@ exports.NuevoPost = async (req, res) => {
                 let Foto = files.PostMedia [0];
                 if (Foto.size > DatosSubidos.maxFileSize) {
                     OtrasFunciones.PaginaErrorPug (res, 400, "El archivo es muy grande. (Límite: 10 MiB)");
+                    return;
                 }
                 let NombreTruncado = encodeURIComponent(Foto.originalFilename.replace(/\s/g, "-"));
                 let Ahora = new Date ();
@@ -155,5 +157,6 @@ exports.NuevoPost = async (req, res) => {
         })
     } catch (error) {
         OtrasFunciones.PaginaErrorPug (res, 500, "Error con la subida:<br>" + error);
+        return;
     }
 }

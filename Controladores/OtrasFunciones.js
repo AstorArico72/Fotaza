@@ -12,6 +12,7 @@ function CargarPaginaPugSegura (req, res, ArchivoPug) {
         OnlineUserId = req.user ["ID_Usuario"];
     } else {
         PaginaErrorPug (res, 401, "No estás autenticado. <a href='./Ingresar'>¿Ingresar?</a>");
+        return;
     }
 
     try {
@@ -22,6 +23,7 @@ function CargarPaginaPugSegura (req, res, ArchivoPug) {
         res.status (200).send (Pagina);
     } catch (Exception) {
         PaginaErrorPug (res, 500, Exception);
+        return;
     }
 }
 
@@ -47,6 +49,7 @@ function CargarPaginaPugBasica (req, res, ArchivoPug) {
         res.status (200).send (Pagina);
     } catch (Exception) {
         PaginaErrorPug (res, 500, Exception);
+        return;
     }
 }
 

@@ -13,6 +13,7 @@ exports.Autenticador = async (req, res, next) => {
             req.user = decoded;
         } catch (err) {
             OtrasFunciones.PaginaErrorPug (res, 500, "Error del servidor con la autenticación. <a href='./Ingresar'>¿Ingresar de nuevo?</a>");
+            return;
         }
     }
     next ();
@@ -46,6 +47,7 @@ exports.LogIn = (async (req, res, next) => {
 
     if (FoundUser.length == 0){
         OtrasFunciones.PaginaErrorPug (res, 401, "Usuario o contraseña incorrectos. <a href='./Ingresar'>¿Ingresar de nuevo?</a>");
+        return;
     } else {
         if (await BCrypt.compare (UserPassword, FoundUser [0]["Contraseña"]) == true) {
             //Ésto genera el token
@@ -61,6 +63,7 @@ exports.LogIn = (async (req, res, next) => {
             res.redirect ("/Posts");
         } else {
             OtrasFunciones.PaginaErrorPug (res, 401, "Usuario o contraseña incorrectos. <a href='./Ingresar'>¿Ingresar de nuevo?</a>");
+            return;
         }
     }
 });
@@ -90,6 +93,7 @@ exports.NewUser = (async (req, res, next) => {
             res.redirect (301, "../");
         } catch (error) {
             OtrasFunciones.PaginaErrorPug (res, 500, "Error con la creación de la cuenta: <br>" + error);
+            return;
         }
     }
 });
