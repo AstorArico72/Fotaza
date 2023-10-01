@@ -29,10 +29,17 @@ exports.VerSubida = async (req, res, _next) => {
                 id: PostSeleccionado [0].Usuario
             }
         });
-        let NombreOP = AutorPost [0].Nombre_Usuario;
 
+        let NombreOP = AutorPost [0].Nombre_Usuario;
         let OnlineUser;
         let OnlineUserId;
+        let TagsPost;
+        let SeparadorComa = new RegExp (/\,\s/, "g");
+
+        if (PostSeleccionado [0].Etiquetas_Post != null) {
+            TagsPost = PostSeleccionado [0].Etiquetas_Post.split (SeparadorComa);
+            TagsPost = TagsPost.join (", ");
+        }
 
         if (typeof req.user !== "undefined") {
             OnlineUser = req.user ["Usuario"];
@@ -51,7 +58,8 @@ exports.VerSubida = async (req, res, _next) => {
             PostNumber: NumeroSubida,
             PostDate: FechaSubida,
             OP_ID: IdAutor,
-            UrlImagen: Foto
+            UrlImagen: Foto,
+            Etiquetas: TagsPost
         });
         res.send (FullPost);
     } else {
@@ -66,7 +74,8 @@ exports.TodosLosPosts = async (req, res) => {
             "Título_Post",
             "createdAt",
             "Usuario",
-            "ID"
+            "ID",
+            "Etiquetas_Post"
         ],
         order: [
             ["createdAt", "DESC"]
@@ -74,6 +83,8 @@ exports.TodosLosPosts = async (req, res) => {
     });
 
     let ListaPosts = [];
+    let SeparadorComa = new RegExp (/\,\s/, "g");
+
     for (let i= 0; i< ListaSubidas.length; i++) {
         let OP = await Usuarios.findAll ({
             where: {
@@ -82,6 +93,10 @@ exports.TodosLosPosts = async (req, res) => {
         });
         let Numero_OP = OP [0].id;
         let Nombre_OP = OP [0].Nombre_Usuario;
+        if (ListaSubidas [i].Etiquetas_Post != null) {
+            let Tags = ListaSubidas [i].Etiquetas_Post.split (SeparadorComa);
+            ListaSubidas [i].Etiquetas= Tags.join (", ");
+        }
         ListaSubidas [i].Numero_OP= Numero_OP;
         ListaSubidas [i].Nombre_OP= Nombre_OP;
         ListaPosts.push (ListaSubidas [i]);
@@ -113,7 +128,7 @@ exports.PaginaSubida = (req, res, _next) => {
 exports.NuevoPost = async (req, res) => {
     let DirectorioSubida = Path.join (__dirname, "../Medios");
     let DatosSubidos = new Formidable.IncomingForm ();
-    DatosSubidos.allowEmptyFiles = true;
+    DatosSubidos.allowEmptyFiles = false;
     DatosSubidos.uploadDir = DirectorioSubida;
     DatosSubidos.multiples = false;
     DatosSubidos.maxFileSize = 10485760; // 10 MiB.
@@ -121,10 +136,13 @@ exports.NuevoPost = async (req, res) => {
     var CamposFormulario = {
         TituloPost: "",
         SubidoPor: null,
-        TextoPost: ""
+        TextoPost: "",
+        EtiquetasPost: ""
     };
+    let SeparadorComa = new RegExp (/\,\s/, "g");
     let SubirDatos = new Promise ((resolve, reject) => {
         DatosSubidos.parse (req, (_error, fields, files)=> {
+            console.log (fields);
             CamposFormulario ["TituloPost"] = fields.TituloPost [0];
             CamposFormulario ["SubidoPor"] = fields.SubidoPor [0];
             CamposFormulario ["TextoPost"] = fields.TextoPost [0];
@@ -140,6 +158,19 @@ exports.NuevoPost = async (req, res) => {
                 FS.renameSync (Foto.filepath, Path.join (DirectorioSubida, NombreArchivo));
                 UrlMedios = "/Medios/" + NombreArchivo;
             }
+            
+            if (typeof (fields.TagsPost [0]) != undefined) {
+                let Tags = fields.TagsPost [0].split (SeparadorComa);
+                if (Tags.length > 3) {
+                    OtrasFunciones.PaginaErrorPug (res, 400, "El límite es de 3 etiquetas.");
+                    return;
+                } else {
+                CamposFormulario ["EtiquetasPost"] = fields.TagsPost [0];
+                }
+            } else {
+                CamposFormulario ["EtiquetasPost"] = null;
+            }
+
             resolve (CamposFormulario);
         });
     });
@@ -150,7 +181,8 @@ exports.NuevoPost = async (req, res) => {
                 Título_Post: data ["TituloPost"],
                 Usuario: data ["SubidoPor"],
                 Texto_Post: data ["TextoPost"],
-                URL_Medios: UrlMedios
+                URL_Medios: UrlMedios,
+                Etiquetas_Post: data ["EtiquetasPost"]
             });
         }).then (()=> {
             res.redirect ("..");

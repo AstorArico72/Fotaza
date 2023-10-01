@@ -36,6 +36,10 @@ html(lang="es")
         h2 Subido el #{PostDate} por&nbsp;
             a(href=`/Usuarios/${OP_ID}`) #{OriginalPoster}
         h3 Subida ##{PostNumber}
+        if (Etiquetas != null)
+            h4 Etiquetas: #{Etiquetas}
+        else
+            h4 Sin etiquetas
         br
         div!= PostContent
             br

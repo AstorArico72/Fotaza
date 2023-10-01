@@ -39,3 +39,7 @@ html(lang="es")
                     a(href=`./Posts/Ver/${Upload ["ID"]}`) #{Upload ["Título_Post"]}
                 h4 Subido el #{Upload ["createdAt"]} por&nbsp;
                     a(href=`/Usuarios/${Upload ["Numero_OP"]}`) #{Upload ["Nombre_OP"]}
+                if (Upload ["Etiquetas"] != null)
+                    h5 Etiquetas: #{Upload ["Etiquetas"]}
+                else
+                    h5 Sin etiquetas
