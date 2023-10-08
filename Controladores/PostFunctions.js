@@ -1,5 +1,4 @@
-const JWT = require ("jsonwebtoken");
-const {Usuarios, Posts} = require ("../models");
+const {Usuarios, Posts, Comentarios} = require ("../models");
 const Pug = require ("pug");
 var OtrasFunciones = require ("./OtrasFunciones.js");
 const Formidable = require ("formidable");
@@ -49,6 +48,29 @@ exports.VerSubida = async (req, res, _next) => {
             OnlineUserId = "NULL";
         }
 
+        let ComentariosPost = await Comentarios.findAll ({
+            where: {
+                ID_Post: NumeroSubida
+            }
+        });
+        let ListaComentarios = [];
+        if (ComentariosPost.length != 0) {
+            for (let i= 0; i < ComentariosPost.length; i++) {
+                let AutorComentario = await Usuarios.findAll ({
+                    where: {
+                        ID: ComentariosPost [i].ID_Usuario
+                    }
+                });
+                ListaComentarios [i] = {
+                    TextoComentario: ComentariosPost [i].Texto_Comentario,
+                    NombreOP: AutorComentario [0].Nombre_Usuario,
+                    FechaSubida: ComentariosPost [i].createdAt
+                }
+            }
+        } else {
+            ListaComentarios = null;
+        }
+
         let FullPost = Pug.renderFile ("./Views/Post.pug", {
             UsuarioConectado: OnlineUser,
             IdUsuarioConectado: OnlineUserId,
@@ -59,7 +81,8 @@ exports.VerSubida = async (req, res, _next) => {
             PostDate: FechaSubida,
             OP_ID: IdAutor,
             UrlImagen: Foto,
-            Etiquetas: TagsPost
+            Etiquetas: TagsPost,
+            Comentarios: ListaComentarios
         });
         res.send (FullPost);
     } else {
@@ -154,7 +177,7 @@ exports.NuevoPost = async (req, res) => {
                 }
                 let NombreTruncado = encodeURIComponent(Foto.originalFilename.replace(/\s/g, "-"));
                 let Ahora = new Date ();
-                let NombreArchivo = Ahora.getFullYear () + "-" + Ahora.getMonth () + "-" + Ahora.getDay () + "-" + Ahora.getHours () + "-" + Ahora.getMinutes () + "-" + Ahora.getSeconds () + "-" + NombreTruncado;
+                let NombreArchivo = Ahora.getFullYear () + "-" + (Ahora.getMonth () +1)+ "-" + Ahora.getDate ()+ "-" + Ahora.getHours () + "-" + Ahora.getMinutes () + "-" + Ahora.getSeconds () + "-" + NombreTruncado;
                 FS.renameSync (Foto.filepath, Path.join (DirectorioSubida, NombreArchivo));
                 UrlMedios = "/Medios/" + NombreArchivo;
             }

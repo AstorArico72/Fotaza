@@ -3,6 +3,7 @@ const OtrasRutas = require("./Rutas/RutasMiscelaneas.js");
 const APP = Express ();
 const RutasUsuario = require ("./Rutas/Usuario.js");
 const RutasSubidas = require ("./Rutas/Posts.js");
+const RutasComentarios = require ("./Rutas/Comentarios.js");
 const CookieParser = require ("cookie-parser");
 const BodyParser = require ("body-parser");
 const path = require ("path");
@@ -27,6 +28,7 @@ APP.use ('/Usuario/Ingresar', Express.static (__dirname + "/Publico/Login.html")
 APP.use ('/Usuario/Nuevo', Express.static (__dirname + "/Publico/NuevoUsuario.html"));
 APP.use ("/Posts", RutasSubidas);
 APP.use ("/Usuario", RutasUsuario);
+APP.use ("/Comentarios", RutasComentarios);
 APP.use (OtrasRutas);
 
 APP.listen (8001, ()=> {

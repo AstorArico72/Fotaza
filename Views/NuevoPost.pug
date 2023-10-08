@@ -8,7 +8,7 @@ html(lang="es")
         title Nueva subida - Fotaza
         link(rel="icon", href="/favicon", type="image/x-icon")
     body
-        nav.navbar.navbar-expand-lg.navbar-nav.navbar-toggleable-sm.navbar-light.bg-light.border-bottom.box-shadow.mb-3
+        nav.navbar.navbar-expand-lg.navbar-nav.navbar-toggleable-sm.navbar-light.bg-light.border-bottom.box-shadow.mb-3.sticky-top
             div.container-fluid
                 div.navbar-collapse.collapse.d-sm-inline-flex.justify-content-between
                     ul.navbar-nav.flex-grow-1.align-items-center
@@ -21,7 +21,7 @@ html(lang="es")
                                     a.nav-link.text-light(href="/Usuario/Ingresar") Iniciar Sesión
                         - else
                             li.nav-item
-                                a.nav-link.text-success(href=`/Usuario/${IdUsuarioConectado}`)
+                                a.nav-link.text-success(href=`./Usuario/${IdUsuarioConectado}`)
                                     h4 #{UsuarioConectado}
                             li.nav-item
                                 a.nav-link.text-danger(href="/Usuario/Salir")
