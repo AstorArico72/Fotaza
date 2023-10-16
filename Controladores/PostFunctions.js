@@ -1,4 +1,4 @@
-const {Usuarios, Posts, Comentarios} = require ("../models");
+const {Usuarios, Posts, Comentarios, sequelize, Sequelize} = require ("../models");
 const Pug = require ("pug");
 var OtrasFunciones = require ("./OtrasFunciones.js");
 const Formidable = require ("formidable");
@@ -32,6 +32,7 @@ exports.VerSubida = async (req, res, _next) => {
         let NombreOP = AutorPost [0].Nombre_Usuario;
         let OnlineUser;
         let OnlineUserId;
+        let UserRole;
         let TagsPost;
         let SeparadorComa = new RegExp (/\,\s/, "g");
 
@@ -43,6 +44,7 @@ exports.VerSubida = async (req, res, _next) => {
         if (typeof req.user !== "undefined") {
             OnlineUser = req.user ["Usuario"];
             OnlineUserId = req.user ["ID_Usuario"];
+            UserRole = req.user ["Rol_Usuario"];
         } else {
             OnlineUser = "NIL";
             OnlineUserId = "NULL";
@@ -74,6 +76,7 @@ exports.VerSubida = async (req, res, _next) => {
         let FullPost = Pug.renderFile ("./Views/Post.pug", {
             UsuarioConectado: OnlineUser,
             IdUsuarioConectado: OnlineUserId,
+            RolUsuario: UserRole,
             PostTitle: TituloPost,
             PostContent: ContenidoPost,
             OriginalPoster: NombreOP,
@@ -140,6 +143,78 @@ exports.TodosLosPosts = async (req, res) => {
         UploadList: ListaPosts,
         UsuarioConectado: OnlineUser,
         IdUsuarioConectado: OnlineUserId
+    });
+    res.send (Listado);
+}
+
+exports.BorrarPost = async (req, res) => {
+    if (req.user == undefined || req.user ["Rol_Usuario"] != "Admin") {
+        OtrasFunciones.PaginaErrorPug (res, 403, "Función no permitida.");
+    } else {
+        Posts.findByPk (req.params.ID).then (post => {
+            post.destroy ();
+        }).then (()=> {
+            res.redirect ("..");
+        });
+    }
+}
+
+exports.BuscarPosts = async (req, res) => {
+    let SearchQuery = req.query.Tag;
+    let ListaSubidas = await Posts.findAll ({
+        attributes: [
+            "Título_Post",
+            "createdAt",
+            "Usuario",
+            "ID",
+            "Etiquetas_Post"
+        ],
+        where: {
+            Etiquetas_Post: {
+                [Sequelize.Op.substring]: SearchQuery
+            }
+        },
+        order: [
+            ["createdAt", "DESC"]
+        ]
+    });
+
+    let ListaPosts = [];
+    let SeparadorComa = new RegExp (/\,\s/, "g");
+
+    for (let i= 0; i< ListaSubidas.length; i++) {
+        let OP = await Usuarios.findAll ({
+            where: {
+                id: ListaSubidas [i].Usuario
+            }
+        });
+        let Numero_OP = OP [0].id;
+        let Nombre_OP = OP [0].Nombre_Usuario;
+        if (ListaSubidas [i].Etiquetas_Post != null) {
+            let Tags = ListaSubidas [i].Etiquetas_Post.split (SeparadorComa);
+            ListaSubidas [i].Etiquetas= Tags.join (", ");
+        }
+        ListaSubidas [i].Numero_OP= Numero_OP;
+        ListaSubidas [i].Nombre_OP= Nombre_OP;
+        ListaPosts.push (ListaSubidas [i]);
+    }
+
+    let OnlineUser;
+    let OnlineUserId;
+
+    if (typeof req.user !== "undefined") {
+        OnlineUser = req.user ["Usuario"];
+        OnlineUserId = req.user ["ID_Usuario"];
+    } else {
+        OnlineUser = "NIL";
+        OnlineUserId = "NULL";
+    }
+
+    let Listado = Pug.renderFile ("./Views/AllPosts.pug", {
+        UploadList: ListaPosts,
+        UsuarioConectado: OnlineUser,
+        IdUsuarioConectado: OnlineUserId,
+        QueryBusqueda: SearchQuery
     });
     res.send (Listado);
 }

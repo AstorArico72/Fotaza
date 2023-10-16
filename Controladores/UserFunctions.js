@@ -54,7 +54,8 @@ exports.LogIn = (async (req, res, next) => {
             const Token = JWT.sign ({
                 "Usuario": UserName,
                 "Contraseña": UserPassword,
-                "ID_Usuario": parseInt (FoundUser [0]["ID"])
+                "ID_Usuario": parseInt (FoundUser [0]["ID"]),
+                "Rol_Usuario": FoundUser [0]["Rol"]
             }, "Ésto no es Instagram", { //Necesito otra forma de manejar los "secretos" 
                 expiresIn: "1h"
             });
@@ -72,6 +73,7 @@ exports.NewUser = (async (req, res, next) => {
     //Éstos datos vienen del formulario que llama a ésta función
     let UserName = req.body.NombreUsuario;
     let UserPassword = req.body.ContraseñaUsuario;
+    let RolUsuario = req.body.RolUsuario;
 
     //Ésto encripta la contraseña
     const salt = await BCrypt.genSalt(10);
@@ -88,7 +90,8 @@ exports.NewUser = (async (req, res, next) => {
         try {
             Usuarios.create ({
                 Nombre_Usuario: UserName,
-                Contraseña: NewPassword
+                Contraseña: NewPassword,
+                Rol: RolUsuario
             });
             res.redirect (301, "../");
         } catch (error) {

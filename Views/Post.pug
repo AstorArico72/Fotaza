@@ -68,6 +68,11 @@ html(lang="es")
         - else
             div.card.bg-info.card-header
                 h3 No hay comentarios
+
+        - if (RolUsuario == "Admin")
+            a(href=`/Posts/Borrar/${PostNumber}`)
+                button.btn.btn-danger
+                    h4 Borrar post
         div.card.bg-light.card-header
             h3
                 a(href="http://127.0.0.1:8001") Página principal

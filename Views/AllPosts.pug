@@ -32,13 +32,23 @@ html(lang="es")
                         li.nav-item
                             a.nav-link(href="/Posts")
                                 h5 Subidas
-        each Upload in UploadList
-            div.bg-light.card-header.card
-                h3
-                    a(href=`./Posts/Ver/${Upload ["ID"]}`) #{Upload ["Título_Post"]}
-                h4 Subido el #{Upload ["createdAt"]} por&nbsp;
-                    a(href=`/Usuarios/${Upload ["Numero_OP"]}`) #{Upload ["Nombre_OP"]}
-                if (Upload ["Etiquetas"] != null)
-                    h5 Etiquetas: #{Upload ["Etiquetas"]}
-                else
-                    h5 Sin etiquetas
+                    form(action="/Posts/Buscar", method="get")
+                        input(type="search", name="Tag", placeholder="Buscar etiquetas...")
+        - if (QueryBusqueda != null)
+            h2 Búsqueda: "#{QueryBusqueda}"
+        - else
+            h2 Posts de Fotaza
+
+        - if (UploadList.length != 0)
+            each Upload in UploadList
+                div.bg-light.card-header.card
+                    h3
+                        a(href=`/Posts/Ver/${Upload ["ID"]}`) #{Upload ["Título_Post"]}
+                    h4 Subido el #{Upload ["createdAt"]} por&nbsp;
+                        a(href=`/Usuarios/${Upload ["Numero_OP"]}`) #{Upload ["Nombre_OP"]}
+                    if (Upload ["Etiquetas"] != null)
+                        h5 Etiquetas: #{Upload ["Etiquetas"]}
+                    else
+                        h5 Sin etiquetas
+        - else
+            h2 No hay resultados
