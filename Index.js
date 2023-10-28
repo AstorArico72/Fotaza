@@ -10,7 +10,11 @@ const path = require ("path");
 
 const OpcionesArchivo = {
     dotfiles: "ignore",
-    extensions: ["jpeg", "jpg", "bmp", "doc", "docx", "odt", "png"]
+    extensions: ["jpeg", "jpg", "bmp", "png", "svg"]
+}
+const OpcionesDoc = {
+    dotfiles: "ignore",
+    extensions: ["jpeg", "jpg", "bmp", "png", "svg", "html"]
 }
 
 APP.set ("view engine", "pug");
@@ -21,6 +25,7 @@ APP.use (BodyParser.urlencoded ({
 }));
 APP.use (Express.urlencoded ());
 APP.use ("/Medios", Express.static ("Medios", OpcionesArchivo));
+APP.use ("/Documentos", Express.static ("Documentos", OpcionesDoc));
 APP.use ("/CSS", Express.static (__dirname + "/Publico/Sketchy-Bootswatch.css"));
 APP.use ('/favicon', Express.static (__dirname + "/Publico/expressjs_logo_icon_169185.ico"));
 //Parece que no puedo manejar los archivos estáticos desde el controlador correspondiente.

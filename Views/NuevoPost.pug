@@ -29,6 +29,12 @@ html(lang="es")
                         li.nav-item
                             a.nav-link(href="/Posts")
                                 h5 Subidas
+                        li.nav-item
+                            a.nav-link(href="/Documentos/Términos-de-uso-y-Licencias.html")
+                                h5 Términos y copyright
+                        li.nav-item
+                            a.nav-link(href="/Documentos/Guía-de-HTML-y-formato.html")
+                                h5 Guía de HTML y formato
         h1 Nueva subida
         h2 Por #{UsuarioConectado}
         br
@@ -40,5 +46,21 @@ html(lang="es")
                 textarea.form-control(name="TextoPost", cols="50", rows="10", placeholder="Texto del post")
                 label(for="Foto") Foto &#40;Máximo 10 MiB&#41;
                 input.form-control#Foto(type="file", name="PostMedia")
+                p Licencia 
+                    a(href="/Documentos/Términos-de-uso-y-Licencias.html") &#40;Más información aquí&#41;&nbsp;
+                    select(name="Licencia")
+                        option(disabled=true) Contenido original o de un tercero
+                        option(value="CC-BY") Creative Commons &#40;CC-BY 4.0&#41;
+                        option(value="CC-BY-SA") Creative Commons Atribución Compartir Igual &#40;CC-BY-SA 4.0&#41;
+                        option(value="CC-BY-ND") Creative Commons Atribución Sin Derivados &#40;CC-BY-ND 4.0&#41;
+                        option(value="CC-BY-NC") Creative Commons Atribución No Comercial &#40;CC-BY-NC 4.0&#41;
+                        option(value="CC-BY-NC-ND") Creative Commons Atribución No Comercial Sin Derivados &#40;CC-BY-NC-ND 4.0&#41;
+                        option(value="CC-BY-NC-SA") Creative Commons Atribución No Comercial Compartir Igual &#40;CC-BY-NC-SA 4.0&#41;
+                        option(value="CC0") Dedicación al Dominio Público - Creative Commons Cero &#40;CC0&#41;
+                        option(disabled=true) Contenido de un tercero exclusivamente
+                        option(value="Copyright") Copyright bajo autorización o uso justo
+                        option(value="Public") Dominio Público
+                        option(disabled=true) No se permite contenido original bajo copyright
+                br
                 button.btn.btn-success(type="submit")
                     b ¡Subir!

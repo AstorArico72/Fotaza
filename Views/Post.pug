@@ -32,6 +32,12 @@ html(lang="es")
                         li.nav-item
                             a.nav-link(href="/Posts")
                                 h5 Subidas
+                        li.nav-item
+                            a.nav-link(href="/Documentos/Términos-de-uso-y-Licencias.html")
+                                h5 Términos y copyright
+                        li.nav-item
+                            a.nav-link(href="/Documentos/Guía-de-HTML-y-formato.html")
+                                h5 Guía de HTML y formato
         div.card.card-header.bg-info
             h1 #{PostTitle}
             h2 Subido el #{PostDate} por&nbsp;
@@ -41,6 +47,9 @@ html(lang="es")
                 h4 Etiquetas: #{Etiquetas}
             - else
                 h4 Sin etiquetas
+            h4 Licencia&nbsp;
+                a(href="/Documentos/Términos-de-uso-y-Licencias.html") &#40;más información aquí&#41;
+            div!=License
         div.card.card-header.bg-light!= PostContent
         - if (UrlImagen !="/Medios/null")
             img.img-thumbnail(src=`${UrlImagen}`, alt=`Imagen del post #${PostNumber}`)

@@ -6,6 +6,7 @@ const Path = require ("path");
 const FS = require ("fs");
 
 exports.VerSubida = async (req, res, _next) => {
+    let ListadoLicencias = require ("../Documentos/Licencias.json");
     let NumeroSubida = req.params.ID;
     let PostSeleccionado = await Posts.findAll ({
         where: {
@@ -23,6 +24,7 @@ exports.VerSubida = async (req, res, _next) => {
         let TituloPost = PostSeleccionado [0].Título_Post;
         let FechaSubida = PostSeleccionado [0].createdAt;
         let IdAutor = PostSeleccionado [0].Usuario;
+        let Licencia = PostSeleccionado [0].Licencia_Foto;
         let AutorPost = await Usuarios.findAll ({
             where: {
                 id: PostSeleccionado [0].Usuario
@@ -34,11 +36,45 @@ exports.VerSubida = async (req, res, _next) => {
         let OnlineUserId;
         let UserRole;
         let TagsPost;
+        let LicenciaFoto;
         let SeparadorComa = new RegExp (/\,\s/, "g");
 
         if (PostSeleccionado [0].Etiquetas_Post != null) {
             TagsPost = PostSeleccionado [0].Etiquetas_Post.split (SeparadorComa);
             TagsPost = TagsPost.join (", ");
+        }
+
+        switch (Licencia) {
+            case "CC-BY":
+                LicenciaFoto = ListadoLicencias.CC.BY;
+                break;
+            case "CC-BY-SA":
+                LicenciaFoto = ListadoLicencias.CC["BY-SA"];
+                break;
+            case "CC-BY-NC":
+                LicenciaFoto = ListadoLicencias.CC["BY-NC"];
+                break;
+            case "CC-BY-ND":
+                LicenciaFoto = ListadoLicencias.CC["BY-ND"];
+                break;
+            case "CC-BY-NC-ND":
+                LicenciaFoto = ListadoLicencias.CC["BY-NC-ND"];
+                break;
+            case "CC-BY-NC-SA":
+                LicenciaFoto = ListadoLicencias.CC["BY-NC-SA"];
+                break;
+            case "CC0":
+                LicenciaFoto = ListadoLicencias.Public.CC0;
+                break;
+            case "Public":
+                LicenciaFoto = ListadoLicencias.Public.PD;
+                break;
+            case "Copyright":
+                LicenciaFoto = ListadoLicencias.Copyright;
+                break;
+            default:
+                LicenciaFoto = "<div class='card'>Ésta obra no está bajo ninguna licencia.</div>"
+                break;
         }
 
         if (typeof req.user !== "undefined") {
@@ -82,6 +118,7 @@ exports.VerSubida = async (req, res, _next) => {
             OriginalPoster: NombreOP,
             PostNumber: NumeroSubida,
             PostDate: FechaSubida,
+            License: LicenciaFoto,
             OP_ID: IdAutor,
             UrlImagen: Foto,
             Etiquetas: TagsPost,
@@ -226,6 +263,7 @@ exports.PaginaSubida = (req, res, _next) => {
 exports.NuevoPost = async (req, res) => {
     let DirectorioSubida = Path.join (__dirname, "../Medios");
     let DatosSubidos = new Formidable.IncomingForm ();
+    let Licencia;
     DatosSubidos.allowEmptyFiles = false;
     DatosSubidos.uploadDir = DirectorioSubida;
     DatosSubidos.multiples = false;
@@ -244,6 +282,7 @@ exports.NuevoPost = async (req, res) => {
             CamposFormulario ["TituloPost"] = fields.TituloPost [0];
             CamposFormulario ["SubidoPor"] = fields.SubidoPor [0];
             CamposFormulario ["TextoPost"] = fields.TextoPost [0];
+            Licencia = fields.Licencia [0];
             if (typeof (files.PostMedia) != "undefined") {
                 let Foto = files.PostMedia [0];
                 if (Foto.size > DatosSubidos.maxFileSize) {
@@ -280,7 +319,8 @@ exports.NuevoPost = async (req, res) => {
                 Usuario: data ["SubidoPor"],
                 Texto_Post: data ["TextoPost"],
                 URL_Medios: UrlMedios,
-                Etiquetas_Post: data ["EtiquetasPost"]
+                Etiquetas_Post: data ["EtiquetasPost"],
+                Licencia_Foto: Licencia
             });
         }).then (()=> {
             res.redirect ("..");

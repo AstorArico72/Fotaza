@@ -37,6 +37,11 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true,
       defaultValue: "NULL"
     },
+    Licencia_Foto: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      defaultValue: "NULL"
+    },
     createdAt: {
       type: DataTypes.DATE,
       allowNull: true
