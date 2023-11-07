@@ -21,7 +21,7 @@ html(lang="es")
                                     a.nav-link.text-light(href="/Usuario/Ingresar") Iniciar Sesión
                         - else
                             li.nav-item
-                                a.nav-link.text-success(href=`./Usuario/${IdUsuarioConectado}`)
+                                a.nav-link.text-success(href=`/Usuario/${IdUsuarioConectado}`)
                                     h4 #{UsuarioConectado}
                             li.nav-item
                                 a.nav-link.text-danger(href="/Usuario/Salir")
@@ -60,7 +60,7 @@ html(lang="es")
         - if (IdUsuarioConectado != "NULL")
             div.card.text-center.bg-light.card-header
                 form(action="/Comentarios/Nuevo", method="post")
-                    h4 Nuevo comentario
+                    h4 Añadir comentario como #{UsuarioConectado}
                     textarea.form-control(name="TextoComentario", cols="50", rows="10", placeholder="Texto del comentario")
                     input(type="hidden", name="SubidoPor", value=`${IdUsuarioConectado}`)
                     input(type="hidden", name="PostNo", value=`${PostNumber}`)
@@ -85,4 +85,4 @@ html(lang="es")
                     h4 Borrar post
         div.card.bg-light.card-header
             h3
-                a(href="http://127.0.0.1:8001") Página principal
+                a(href="/") Página principal

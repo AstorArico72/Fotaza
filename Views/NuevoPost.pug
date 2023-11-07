@@ -21,7 +21,7 @@ html(lang="es")
                                     a.nav-link.text-light(href="/Usuario/Ingresar") Iniciar Sesión
                         - else
                             li.nav-item
-                                a.nav-link.text-success(href=`./Usuario/${IdUsuarioConectado}`)
+                                a.nav-link.text-success(href=`/Usuario/${IdUsuarioConectado}`)
                                     h4 #{UsuarioConectado}
                             li.nav-item
                                 a.nav-link.text-danger(href="/Usuario/Salir")
@@ -66,7 +66,8 @@ html(lang="es")
                     |Categoría&nbsp;
                     select(name="Categoría")
                         option(disabled=true selected) Elige una
-                        option(value="NULL") Sin categoría
+                        //- Espero las comillas vacías sean tomadas como NULL y no como "null"
+                        option(value="") Sin categoría
                         option(value="Paisaje") Paisajes
                         option(value="Animales") Fauna
                         option(value="Plantas") Flora

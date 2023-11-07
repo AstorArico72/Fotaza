@@ -232,16 +232,16 @@ exports.BuscarPosts = async (req, res) => {
     let ListadoCategorías = require ("../Publico/Categorías.json");
     let SequelizeQuery = "SELECT `Título_Post`, `createdAt`, `Usuario`, `ID`, `Etiquetas_Post`, `Categoría_Post`, `Licencia_Foto` FROM `Posts` AS `Posts` WHERE ";
     switch (req.query.Tag) {
-        case null || undefined:
-            SequelizeQuery += "`Posts`.`Etiquetas_Post`=NULL ";
+        case "null" || undefined:
+            SequelizeQuery += "`Posts`.`Etiquetas_Post` IS NULL ";
             break;
         default:
             SequelizeQuery += "`Posts`.`Etiquetas_Post` LIKE \"%" + req.query.Tag + "%\" ";
             break;
     }
     switch (req.query.Categoria) {
-        case null || undefined:
-            SequelizeQuery += "AND `Posts`.`Categoría_Post`=NULL ";
+        case "null" || undefined:
+            SequelizeQuery += "AND `Posts`.`Categoría_Post` IS NULL ";
             break;
         case "Todas":
             //Saltar el parámetro
@@ -251,8 +251,8 @@ exports.BuscarPosts = async (req, res) => {
             break;
     }
     switch (req.query.Licencia) {
-        case null || undefined:
-            SequelizeQuery += "AND `Posts`.`Licencia_Foto`=NULL ";
+        case "null" || undefined:
+            SequelizeQuery += "AND `Posts`.`Licencia_Foto` IS NULL ";
             break;
         case "Todas":
             //Saltar el parámetro
@@ -336,8 +336,9 @@ exports.NuevoPost = async (req, res) => {
         multiples: false,
         maxFileSize: 10485760,
         filter: function ({name, originalFilename, mimetype}) {
+            var HayArchivo = originalFilename !== "";
             var MimeValido = OpcionesArchivo.OpcionesArchivo.mime.includes (mimetype);
-            if (!MimeValido) {
+            if (!MimeValido && HayArchivo) {
                 DatosSubidos.emit ('error', new errors.default ("El tipo MIME del archivo subido es inválido", 0, 415));
                 CancelarSubida = true;
             }
@@ -360,12 +361,12 @@ exports.NuevoPost = async (req, res) => {
             CamposFormulario ["TituloPost"] = fields.TituloPost [0];
             CamposFormulario ["SubidoPor"] = fields.SubidoPor [0];
             CamposFormulario ["TextoPost"] = fields.TextoPost [0];
-            if (fields.Categoría === undefined) {
+            if (fields.Categoría == undefined || fields.Categoría == "") {
                 Categoría = null;
             } else {
                 Categoría = fields.Categoría [0];
             }
-            if (fields.Licencia === undefined) {
+            if (fields.Licencia == undefined || fields.Licencia == "") {
                 Licencia = null;
             } else {
                 Licencia = fields.Licencia [0];
