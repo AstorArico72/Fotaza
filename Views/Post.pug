@@ -38,7 +38,7 @@ html(lang="es")
                         li.nav-item
                             a.nav-link(href="/Documentos/Guía-de-HTML-y-formato.html")
                                 h5 Guía de HTML y formato
-        div.card.card-header.bg-info
+        div.card.card-header(style=`background-color: ${ColorCategoría};`)
             h1 #{PostTitle}
             h2 Subido el #{PostDate} por&nbsp;
                 a(href=`/Usuarios/${OP_ID}`) #{OriginalPoster}
@@ -50,6 +50,7 @@ html(lang="es")
             h4 Licencia&nbsp;
                 a(href="/Documentos/Términos-de-uso-y-Licencias.html") &#40;más información aquí&#41;
             div!=License
+            h4 Categoría: #{CategoríaPost}
         div.card.card-header.bg-light!= PostContent
         - if (UrlImagen !="/Medios/null")
             img.img-thumbnail(src=`${UrlImagen}`, alt=`Imagen del post #${PostNumber}`)

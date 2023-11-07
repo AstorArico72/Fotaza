@@ -46,9 +46,10 @@ html(lang="es")
                 textarea.form-control(name="TextoPost", cols="50", rows="10", placeholder="Texto del post")
                 label(for="Foto") Foto &#40;Máximo 10 MiB&#41;
                 input.form-control#Foto(type="file", name="PostMedia")
-                p Licencia 
+                p Licencia&nbsp;
                     a(href="/Documentos/Términos-de-uso-y-Licencias.html") &#40;Más información aquí&#41;&nbsp;
                     select(name="Licencia")
+                        option(disabled=true selected) Elige una
                         option(disabled=true) Contenido original o de un tercero
                         option(value="CC-BY") Creative Commons &#40;CC-BY 4.0&#41;
                         option(value="CC-BY-SA") Creative Commons Atribución Compartir Igual &#40;CC-BY-SA 4.0&#41;
@@ -61,6 +62,20 @@ html(lang="es")
                         option(value="Copyright") Copyright bajo autorización o uso justo
                         option(value="Public") Dominio Público
                         option(disabled=true) No se permite contenido original bajo copyright
+                    br
+                    |Categoría&nbsp;
+                    select(name="Categoría")
+                        option(disabled=true selected) Elige una
+                        option(value="NULL") Sin categoría
+                        option(value="Paisaje") Paisajes
+                        option(value="Animales") Fauna
+                        option(value="Plantas") Flora
+                        option(value="Deportes") Deportes de cualquier tipo
+                        option(value="Salud") Salud, bienestar
+                        option(value="Stock") Foto de stock
+                        option(value="Automotor") Autos, motos, y afines
+                        option(value="Arte") Arte, dibujos, y manualidades
+                        option(value="Diversión") Diversión variada
                 br
                 button.btn.btn-success(type="submit")
                     b ¡Subir!

@@ -42,6 +42,11 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true,
       defaultValue: "NULL"
     },
+    Categoría_Post: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      defaultValue: "NULL"
+    },
     createdAt: {
       type: DataTypes.DATE,
       allowNull: true

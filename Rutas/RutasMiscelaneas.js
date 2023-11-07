@@ -1,6 +1,5 @@
 const Express = require ("express");
 const ROUTER = Express.Router ();
-const Pug = require ("pug");
 const { Autenticador } = require("../Controladores/UserFunctions");
 var OtrasFunciones = require("../Controladores/OtrasFunciones.js");
 

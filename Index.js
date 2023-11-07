@@ -10,7 +10,8 @@ const path = require ("path");
 
 const OpcionesArchivo = {
     dotfiles: "ignore",
-    extensions: ["jpeg", "jpg", "bmp", "png", "svg"]
+    extensions: ["jpeg", "jpg", "bmp", "png", "svg"],
+    mime: ["image/jpeg", "image/bmp", "image/png", "image/svg"]
 }
 const OpcionesDoc = {
     dotfiles: "ignore",
@@ -39,3 +40,5 @@ APP.use (OtrasRutas);
 APP.listen (8001, ()=> {
     console.log ("Servidor iniciado en puerto 8001.");
 });
+
+exports.OpcionesArchivo = OpcionesArchivo;

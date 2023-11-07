@@ -1,6 +1,4 @@
 const Pug = require ("pug");
-const FS = require ("fs");
-const Path = require ("path");
 
 function CargarPaginaPugSegura (req, res, ArchivoPug) {
     let OnlineUser;

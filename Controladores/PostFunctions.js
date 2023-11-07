@@ -1,12 +1,13 @@
 const {Usuarios, Posts, Comentarios, sequelize, Sequelize} = require ("../models");
 const Pug = require ("pug");
 var OtrasFunciones = require ("./OtrasFunciones.js");
-const Formidable = require ("formidable");
 const Path = require ("path");
 const FS = require ("fs");
+const {formidable, errors} = require ("formidable");
 
 exports.VerSubida = async (req, res, _next) => {
-    let ListadoLicencias = require ("../Documentos/Licencias.json");
+    let ListadoLicencias = require ("../Publico/Licencias.json");
+    let ListadoCategorías = require ("../Publico/Categorías.json");
     let NumeroSubida = req.params.ID;
     let PostSeleccionado = await Posts.findAll ({
         where: {
@@ -37,6 +38,9 @@ exports.VerSubida = async (req, res, _next) => {
         let UserRole;
         let TagsPost;
         let LicenciaFoto;
+        let Categoría = PostSeleccionado [0].Categoría_Post;
+        let CategoríaPost;
+        let ColorPrincipal;
         let SeparadorComa = new RegExp (/\,\s/, "g");
 
         if (PostSeleccionado [0].Etiquetas_Post != null) {
@@ -74,6 +78,18 @@ exports.VerSubida = async (req, res, _next) => {
                 break;
             default:
                 LicenciaFoto = "<div class='card'>Ésta obra no está bajo ninguna licencia.</div>"
+                break;
+        }
+
+        switch (Categoría) {
+            case null:
+                CategoríaPost = "Sin categoría";
+                ColorPrincipal = ListadoCategorías.Colores.Nada;
+                break;
+        
+            default:
+                CategoríaPost = ListadoCategorías.Categorías [Categoría];
+                ColorPrincipal = ListadoCategorías.Colores [Categoría];
                 break;
         }
 
@@ -122,7 +138,9 @@ exports.VerSubida = async (req, res, _next) => {
             OP_ID: IdAutor,
             UrlImagen: Foto,
             Etiquetas: TagsPost,
-            Comentarios: ListaComentarios
+            CategoríaPost: CategoríaPost,
+            Comentarios: ListaComentarios,
+            ColorCategoría: ColorPrincipal
         });
         res.send (FullPost);
     } else {
@@ -132,13 +150,15 @@ exports.VerSubida = async (req, res, _next) => {
 }
 
 exports.TodosLosPosts = async (req, res) => {
+    let ListadoCategorías = require ("../Publico/Categorías.json");
     let ListaSubidas = await Posts.findAll ({
         attributes: [
             "Título_Post",
             "createdAt",
             "Usuario",
             "ID",
-            "Etiquetas_Post"
+            "Etiquetas_Post",
+            "Categoría_Post"
         ],
         order: [
             ["createdAt", "DESC"]
@@ -160,8 +180,20 @@ exports.TodosLosPosts = async (req, res) => {
             let Tags = ListaSubidas [i].Etiquetas_Post.split (SeparadorComa);
             ListaSubidas [i].Etiquetas= Tags.join (", ");
         }
+        let CategoríaPost = ListaSubidas [i].Categoría_Post;
+        let ColorPost;
+        switch (CategoríaPost) {
+            case null:
+                ColorPost = ListadoCategorías.Colores.Nada;
+                break;
+        
+            default:
+                ColorPost = ListadoCategorías.Colores [CategoríaPost];
+                break;
+        }
         ListaSubidas [i].Numero_OP= Numero_OP;
         ListaSubidas [i].Nombre_OP= Nombre_OP;
+        ListaSubidas [i].Color_Fondo= ColorPost;
         ListaPosts.push (ListaSubidas [i]);
     }
 
@@ -197,23 +229,42 @@ exports.BorrarPost = async (req, res) => {
 }
 
 exports.BuscarPosts = async (req, res) => {
-    let SearchQuery = req.query.Tag;
-    let ListaSubidas = await Posts.findAll ({
-        attributes: [
-            "Título_Post",
-            "createdAt",
-            "Usuario",
-            "ID",
-            "Etiquetas_Post"
-        ],
-        where: {
-            Etiquetas_Post: {
-                [Sequelize.Op.substring]: SearchQuery
-            }
-        },
-        order: [
-            ["createdAt", "DESC"]
-        ]
+    let ListadoCategorías = require ("../Publico/Categorías.json");
+    let SequelizeQuery = "SELECT `Título_Post`, `createdAt`, `Usuario`, `ID`, `Etiquetas_Post`, `Categoría_Post`, `Licencia_Foto` FROM `Posts` AS `Posts` WHERE ";
+    switch (req.query.Tag) {
+        case null || undefined:
+            SequelizeQuery += "`Posts`.`Etiquetas_Post`=NULL ";
+            break;
+        default:
+            SequelizeQuery += "`Posts`.`Etiquetas_Post` LIKE \"%" + req.query.Tag + "%\" ";
+            break;
+    }
+    switch (req.query.Categoria) {
+        case null || undefined:
+            SequelizeQuery += "AND `Posts`.`Categoría_Post`=NULL ";
+            break;
+        case "Todas":
+            //Saltar el parámetro
+            break;
+        default:
+            SequelizeQuery += "AND `Posts`.`Categoría_Post`=\"" + req.query.Categoria + "\" ";
+            break;
+    }
+    switch (req.query.Licencia) {
+        case null || undefined:
+            SequelizeQuery += "AND `Posts`.`Licencia_Foto`=NULL ";
+            break;
+        case "Todas":
+            //Saltar el parámetro
+            break;
+        default:
+            SequelizeQuery += "AND `Posts`.`Licencia_Foto`=\"" + req.query.Licencia + "\" ";
+            break;
+    }
+    SequelizeQuery += "ORDER BY `Posts`.`createdAt` DESC;";
+    let ListaSubidas = await sequelize.query (SequelizeQuery, {
+        model: Posts,
+        mapToModel: true
     });
 
     let ListaPosts = [];
@@ -231,8 +282,20 @@ exports.BuscarPosts = async (req, res) => {
             let Tags = ListaSubidas [i].Etiquetas_Post.split (SeparadorComa);
             ListaSubidas [i].Etiquetas= Tags.join (", ");
         }
+        let CategoríaPost = ListaSubidas [i].Categoría_Post;
+        let ColorPost;
+        switch (CategoríaPost) {
+            case null:
+                ColorPost = ListadoCategorías.Colores.Nada;
+                break;
+        
+            default:
+                ColorPost = ListadoCategorías.Colores [CategoríaPost];
+                break;
+        }
         ListaSubidas [i].Numero_OP= Numero_OP;
         ListaSubidas [i].Nombre_OP= Nombre_OP;
+        ListaSubidas [i].Color_Fondo= ColorPost;
         ListaPosts.push (ListaSubidas [i]);
     }
 
@@ -251,7 +314,7 @@ exports.BuscarPosts = async (req, res) => {
         UploadList: ListaPosts,
         UsuarioConectado: OnlineUser,
         IdUsuarioConectado: OnlineUserId,
-        QueryBusqueda: SearchQuery
+        QueryBusqueda: "Etiqueta(s): " + req.query.Tag + ", Categoría: " + req.query.Categoria + ", Licencia: " + req.query.Licencia
     });
     res.send (Listado);
 }
@@ -261,13 +324,28 @@ exports.PaginaSubida = (req, res, _next) => {
 }
 
 exports.NuevoPost = async (req, res) => {
+    let OpcionesArchivo = require ("../Index.js");
     let DirectorioSubida = Path.join (__dirname, "../Medios");
-    let DatosSubidos = new Formidable.IncomingForm ();
     let Licencia;
-    DatosSubidos.allowEmptyFiles = false;
-    DatosSubidos.uploadDir = DirectorioSubida;
-    DatosSubidos.multiples = false;
-    DatosSubidos.maxFileSize = 10485760; // 10 MiB.
+    let Categoría;
+    var CancelarSubida = false;
+    const OpcionesFormulario = {
+        keepExtensions: true,
+        allowEmptyFiles: false,
+        uploadDir: DirectorioSubida,
+        multiples: false,
+        maxFileSize: 10485760,
+        filter: function ({name, originalFilename, mimetype}) {
+            var MimeValido = OpcionesArchivo.OpcionesArchivo.mime.includes (mimetype);
+            if (!MimeValido) {
+                DatosSubidos.emit ('error', new errors.default ("El tipo MIME del archivo subido es inválido", 0, 415));
+                CancelarSubida = true;
+            }
+            return MimeValido && !CancelarSubida;
+        }
+    };
+    var DatosSubidos = formidable (OpcionesFormulario);
+
     var UrlMedios = null;
     var CamposFormulario = {
         TituloPost: "",
@@ -277,18 +355,24 @@ exports.NuevoPost = async (req, res) => {
     };
     let SeparadorComa = new RegExp (/\,\s/, "g");
     let SubirDatos = new Promise ((resolve, reject) => {
-        DatosSubidos.parse (req, (_error, fields, files)=> {
+        DatosSubidos.parse (req, (error, fields, files)=> {
             console.log (fields);
             CamposFormulario ["TituloPost"] = fields.TituloPost [0];
             CamposFormulario ["SubidoPor"] = fields.SubidoPor [0];
             CamposFormulario ["TextoPost"] = fields.TextoPost [0];
-            Licencia = fields.Licencia [0];
-            if (typeof (files.PostMedia) != "undefined") {
+            if (fields.Categoría === undefined) {
+                Categoría = null;
+            } else {
+                Categoría = fields.Categoría [0];
+            }
+            if (fields.Licencia === undefined) {
+                Licencia = null;
+            } else {
+                Licencia = fields.Licencia [0];
+            }
+
+            if (files.PostMedia !== undefined) {
                 let Foto = files.PostMedia [0];
-                if (Foto.size > DatosSubidos.maxFileSize) {
-                    OtrasFunciones.PaginaErrorPug (res, 400, "El archivo es muy grande. (Límite: 10 MiB)");
-                    return;
-                }
                 let NombreTruncado = encodeURIComponent(Foto.originalFilename.replace(/\s/g, "-"));
                 let Ahora = new Date ();
                 let NombreArchivo = Ahora.getFullYear () + "-" + (Ahora.getMonth () +1)+ "-" + Ahora.getDate ()+ "-" + Ahora.getHours () + "-" + Ahora.getMinutes () + "-" + Ahora.getSeconds () + "-" + NombreTruncado;
@@ -296,19 +380,23 @@ exports.NuevoPost = async (req, res) => {
                 UrlMedios = "/Medios/" + NombreArchivo;
             }
             
-            if (typeof (fields.TagsPost [0]) != undefined) {
+            if (typeof (fields.TagsPost [0]) != "undefined") {
                 let Tags = fields.TagsPost [0].split (SeparadorComa);
                 if (Tags.length > 3) {
                     OtrasFunciones.PaginaErrorPug (res, 400, "El límite es de 3 etiquetas.");
                     return;
                 } else {
-                CamposFormulario ["EtiquetasPost"] = fields.TagsPost [0];
+                    CamposFormulario ["EtiquetasPost"] = fields.TagsPost [0];
                 }
             } else {
                 CamposFormulario ["EtiquetasPost"] = null;
             }
-
-            resolve (CamposFormulario);
+            if (!error) {
+                resolve (CamposFormulario);
+            } else {
+                console.log ("Subida cancelada: " + error);
+                return OtrasFunciones.PaginaErrorPug (res, error.httpCode, error);
+            }
         });
     });
     try {
@@ -320,13 +408,13 @@ exports.NuevoPost = async (req, res) => {
                 Texto_Post: data ["TextoPost"],
                 URL_Medios: UrlMedios,
                 Etiquetas_Post: data ["EtiquetasPost"],
-                Licencia_Foto: Licencia
+                Licencia_Foto: Licencia,
+                Categoría_Post: Categoría
             });
         }).then (()=> {
             res.redirect ("..");
         })
     } catch (error) {
-        OtrasFunciones.PaginaErrorPug (res, 500, "Error con la subida:<br>" + error);
-        return;
+            OtrasFunciones.PaginaErrorPug (res, 400, "Error con la subida:<br>" + error);
     }
 }

@@ -38,16 +38,47 @@ html(lang="es")
                         li.nav-item
                             a.nav-link(href="/Documentos/Guía-de-HTML-y-formato.html")
                                 h5 Guía de HTML y formato
-                    form(action="/Posts/Buscar", method="get")
-                        input(type="search", name="Tag", placeholder="Buscar etiquetas...")
+                        li.nav-item
+                            form(action="/Posts/Buscar", method="get")
+                                p
+                                    input(type="search", name="Tag", placeholder="Etiquetas")
+                                    |Categoría:&nbsp;
+                                    select(name="Categoria")
+                                        option(value="Todas" selected) Cualquier categoría
+                                        option(value="Paisaje") Paisajes
+                                        option(value="Animales") Fauna
+                                        option(value="Plantas") Flora
+                                        option(value="Deportes") Deportes de cualquier tipo
+                                        option(value="Salud") Salud, bienestar
+                                        option(value="Stock") Foto de stock
+                                        option(value="Automotor") Autos, motos, y afines
+                                        option(value="Arte") Arte, dibujos, y manualidades
+                                        option(value="Diversión") Diversión variada
+                                        option(value="null") Sin categoría
+                                    |Licencia:&nbsp;
+                                    select(name="Licencia")
+                                        option(value="Todas" selected) Cualquier licencia
+                                        option(value="CC-BY") CC-BY
+                                        option(value="CC-BY-SA") CC-BY-SA
+                                        option(value="CC-BY-ND") CC-BY-ND
+                                        option(value="CC-BY-NC") CC-BY-NC
+                                        option(value="CC-BY-NC-ND") CC-BY-NC-ND
+                                        option(value="CC-BY-NC-SA") CC-BY-NC-SA
+                                        option(value="CC0") CC Zero
+                                        option(value="Copyright") Copyright
+                                        option(value="Public") Dominio Público
+                                        option(value="null") Sin licencia
+                                    button.btn.btn-success(type="submit") Buscar
+
         - if (QueryBusqueda != null)
             h2 Búsqueda: "#{QueryBusqueda}"
+            h3 Resultados: #{UploadList.length}
         - else
             h2 Posts de Fotaza
-
+            h3 Total de posts: #{UploadList.length}
         - if (UploadList.length != 0)
             each Upload in UploadList
-                div.bg-light.card-header.card
+                div.card.card-header(style=`background-color: ${Upload ["Color_Fondo"]};`)
                     h3
                         a(href=`/Posts/Ver/${Upload ["ID"]}`) #{Upload ["Título_Post"]}
                     h4 Subido el #{Upload ["createdAt"]} por&nbsp;

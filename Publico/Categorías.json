@@ -1,0 +1,25 @@
+{
+    "Categorías": {
+        "Paisaje": ["Paisajes"],
+        "Animales": ["Fauna"],
+        "Plantas": ["Flora"],
+        "Deportes": ["Deportes de cualquier tipo"],
+        "Salud": ["Salud, bienestar"],
+        "Stock": ["Foto de stock"],
+        "Automotor": ["Autos, motos, y afines"],
+        "Arte": ["Arte, dibujos, y manualidades"],
+        "Diversión": ["Diversión variada"]
+    },
+    "Colores": {
+        "Paisaje": ["DarkGreen"],
+        "Animales": ["SaddleBrown"],
+        "Plantas": ["Chartreuse"],
+        "Deportes": ["OrangeRed"],
+        "Salud": ["Red"],
+        "Stock": ["White"],
+        "Automotor": ["LightSlateGrey"],
+        "Arte": ["Magenta"],
+        "Diversión": ["Blue"],
+        "Nada": ["DodgerBlue"]
+    }
+}
