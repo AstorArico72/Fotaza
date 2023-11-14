@@ -2,13 +2,13 @@ doctype html
 html(lang="es")
     head
         meta(charset="UTF-8")
-        meta(http-equiv="X-UA-Compatible", content="IE=edge")
-        meta(name="viewport", content="width=device-width, initial-scale=1.0")
-        link(rel="stylesheet", href="/CSS", type="Text/CSS")
-        title Fotaza
-        link(rel="icon", href="/favicon", type="image/x-icon")
+        meta(http-equiv="X-UA-Compatible" content="IE=edge")
+        meta(name="viewport" content="width=device-width, initial-scale=1.0")
+        title Cambiar contraseña de #{UserName} - Fotaza
+        link(rel="stylesheet" href="/CSS" type="Text/CSS")
+        link(rel="icon" type="image/x-icon" href="/favicon")
     body
-        nav.navbar.navbar-expand-lg.navbar-nav.navbar-toggleable-sm.navbar-light.bg-light.border-bottom.box-shadow.mb-3
+        nav.navbar.navbar-expand-lg.navbar-nav.navbar-toggleable-sm.navbar-light.bg-light.border-bottom.box-shadow.mb-3.sticky-top
             div.container-fluid
                 div.navbar-collapse.collapse.d-sm-inline-flex.justify-content-between
                     ul.navbar-nav.flex-grow-1.align-items-center
@@ -22,16 +22,10 @@ html(lang="es")
                         - else
                             li.nav-item
                                 a.nav-link.text-success(href=`/Usuario/Perfil/${IdUsuarioConectado}`)
-                                    h4 #{UsuarioConectado}
+                                    h4 #{UserName}
                             li.nav-item
                                 a.nav-link.text-danger(href="/Usuario/Salir")
                                     h5 Salir
-                            li.nav-item
-                                a.nav-link.text-info(href="/Posts/Subir")
-                                    h5 Subir Post
-                            li.nav-item
-                                a.nav-link.text-warning(href="/Usuario/EditarPerfil")
-                                    h5 Editar Perfil
                         li.nav-item
                             a.nav-link(href="/Posts")
                                 h5 Subidas
@@ -41,8 +35,10 @@ html(lang="es")
                         li.nav-item
                             a.nav-link(href="/Documentos/Guía-de-HTML-y-formato.html")
                                 h5 Guía de HTML y formato
-        h1 Fotaza
-        p Trabajo hecho por Astor Aricó. ¡Ya vienen más funciones!
-        a(href="./Posts") Explorar el contenido
-        br
-        a(href="/Usuario/Ingresar") Ingresar a Fotaza
+        h1 Editando contraseña de #{UserName}
+        form(action="/Usuario/GuardarClave" method="post" enctype="application/x-www-form-urlencoded")
+            input(type="hidden" name="IdUsuario" value=`${IdUsuarioConectado}`)
+            label(for="CampoContrasena") Nueva contraseña
+            input#CampoContrasena(class="form-control" type="password" max="255" name="ContraseñaUsuario" placeholder="Nueva contraseña")
+            button(type="submit" class="btn btn-success") Guardar cambios
+        h3 La sesión será cerrada tras guardar los cambios.

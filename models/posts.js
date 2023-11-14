@@ -30,22 +30,27 @@ module.exports = (sequelize, DataTypes) => {
     URL_Medios: {
       type: DataTypes.STRING,
       allowNull: true,
-      defaultValue: "NULL"
+      defaultValue: null
     },
     Etiquetas_Post: {
       type: DataTypes.STRING,
       allowNull: true,
-      defaultValue: "NULL"
+      defaultValue: null
     },
     Licencia_Foto: {
       type: DataTypes.STRING,
       allowNull: true,
-      defaultValue: "NULL"
+      defaultValue: null
     },
     Categoría_Post: {
       type: DataTypes.STRING,
       allowNull: true,
-      defaultValue: "NULL"
+      defaultValue: null
+    },
+    Visibilidad: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: "Público"
     },
     createdAt: {
       type: DataTypes.DATE,

@@ -21,14 +21,17 @@ html(lang="es")
                                     a.nav-link.text-light(href="/Usuario/Ingresar") Iniciar Sesión
                         - else
                             li.nav-item
-                                a.nav-link.text-success(href=`/Usuario/${IdUsuarioConectado}`)
+                                a.nav-link.text-success(href=`/Usuario/Perfil/${IdUsuarioConectado}`)
                                     h4 #{UsuarioConectado}
                             li.nav-item
                                 a.nav-link.text-danger(href="/Usuario/Salir")
                                     h5 Salir
                             li.nav-item
-                                a.nav-link(href="/Posts/Subir")
+                                a.nav-link.text-info(href="/Posts/Subir")
                                     h5 Subir Post
+                            li.nav-item
+                                a.nav-link.text-warning(href="/Usuario/EditarPerfil")
+                                    h5 Editar Perfil
                         li.nav-item
                             a.nav-link(href="/Posts")
                                 h5 Subidas
@@ -82,7 +85,7 @@ html(lang="es")
                     h3
                         a(href=`/Posts/Ver/${Upload ["ID"]}`) #{Upload ["Título_Post"]}
                     h4 Subido el #{Upload ["createdAt"]} por&nbsp;
-                        a(href=`/Usuarios/${Upload ["Numero_OP"]}`) #{Upload ["Nombre_OP"]}
+                        a(href=`/Usuario/Perfil/${Upload ["Numero_OP"]}`) #{Upload ["Nombre_OP"]}
                     if (Upload ["Etiquetas"] != null)
                         h5 Etiquetas: #{Upload ["Etiquetas"]}
                     else

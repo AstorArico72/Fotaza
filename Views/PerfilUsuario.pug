@@ -5,7 +5,7 @@ html(lang="es")
         meta(http-equiv="X-UA-Compatible", content="IE=edge")
         meta(name="viewport", content="width=device-width, initial-scale=1.0")
         link(rel="stylesheet", href="/CSS", type="Text/CSS")
-        title #{PostTitle} - Fotaza
+        title #{UserName} - Fotaza
         link(rel="icon", href="/favicon", type="image/x-icon")
     body
         nav.navbar.navbar-expand-lg.navbar-nav.navbar-toggleable-sm.navbar-light.bg-light.border-bottom.box-shadow.mb-3.sticky-top
@@ -21,7 +21,7 @@ html(lang="es")
                                     a.nav-link.text-light(href="/Usuario/Ingresar") Iniciar Sesión
                         - else
                             li.nav-item
-                                a.nav-link.text-success(href=`/Usuario/${IdUsuarioConectado}`)
+                                a.nav-link.text-success(href=`/Usuario/Perfil/${IdUsuarioConectado}`)
                                     h4 #{UsuarioConectado}
                             li.nav-item
                                 a.nav-link.text-danger(href="/Usuario/Salir")
@@ -41,51 +41,18 @@ html(lang="es")
                         li.nav-item
                             a.nav-link(href="/Documentos/Guía-de-HTML-y-formato.html")
                                 h5 Guía de HTML y formato
-        div.card.card-header(style=`background-color: ${ColorCategoría};`)
-            h1 #{PostTitle}
-            h2 Subido el #{PostDate} por&nbsp;
-                a(href=`/Usuario/Perfil/${OP_ID}`) #{OriginalPoster}
-            h3 Subida ##{PostNumber}
-            - if (Etiquetas != null)
-                h4 Etiquetas: #{Etiquetas}
-            - else
-                h4 Sin etiquetas
-            h4 Licencia&nbsp;
-                a(href="/Documentos/Términos-de-uso-y-Licencias.html") &#40;más información aquí&#41;
-            div!=License
-            h4 Categoría: #{CategoríaPost}
-        div.card.card-header.bg-light!= PostContent
-        - if (UrlImagen !="/Medios/null")
-            img.img-thumbnail(src=`${UrlImagen}`, alt=`Imagen del post #${PostNumber}`)
-            br
+        div.card.card-header
+            h1 #{UserName}
+            h2 Se unió el #{JoinDate}
+            h3 ID ##{UserID}
+            h3 Rol: #{UserRole}
+            h4
+                a(href=`/Posts/Buscar?Usuario=${UserID}&Licencia=Todas&Categoria=Todas&Tag=Todas`) Ver subidas del usuario
+        - if (UserProfile == null)
+            div.card.bg-light.card-header
+                h3 Éste usuario no tiene descripción.
         - else
-            p.card.card-header.bg-warning No hay imágenes.
-        - if (IdUsuarioConectado != "NULL")
-            div.card.text-center.bg-light.card-header
-                form(action="/Comentarios/Nuevo", method="post")
-                    h4 Añadir comentario como #{UsuarioConectado}
-                    textarea.form-control(name="TextoComentario", cols="50", rows="10", placeholder="Texto del comentario")
-                    input(type="hidden", name="SubidoPor", value=`${IdUsuarioConectado}`)
-                    input(type="hidden", name="PostNo", value=`${PostNumber}`)
-                    button.btn.btn-success(type="submit")
-                        b ¡Subir!
-            br
-        - if (Comentarios != null)
-            div.card.bg-info.card-header
-                h3 Comentarios
-                each Comentario in Comentarios
-                    div.card.card-body
-                        h4 #{Comentario["NombreOP"]}
-                        h5 Subido el #{Comentario["FechaSubida"]}
-                        p!=Comentario["TextoComentario"]
-        - else
-            div.card.bg-info.card-header
-                h3 No hay comentarios
-
-        - if (RolUsuario == "Admin")
-            a(href=`/Posts/Borrar/${PostNumber}`)
-                button.btn.btn-danger
-                    h4 Borrar post
+            div.card.card-header.bg-light!=UserProfile
         div.card.bg-light.card-header
             h3
                 a(href="/") Página principal

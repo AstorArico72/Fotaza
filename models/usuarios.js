@@ -22,6 +22,11 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true,
       defaultValue: "User"
     },
+    Perfil_Usuario: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      defaultValue: null
+    },
     createdAt: DataTypes.DATE,
     updatedAt: DataTypes.DATE
   }, {

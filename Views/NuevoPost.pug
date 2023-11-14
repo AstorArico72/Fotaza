@@ -21,11 +21,14 @@ html(lang="es")
                                     a.nav-link.text-light(href="/Usuario/Ingresar") Iniciar Sesión
                         - else
                             li.nav-item
-                                a.nav-link.text-success(href=`/Usuario/${IdUsuarioConectado}`)
+                                a.nav-link.text-success(href=`/Usuario/Perfil/${IdUsuarioConectado}`)
                                     h4 #{UsuarioConectado}
                             li.nav-item
                                 a.nav-link.text-danger(href="/Usuario/Salir")
                                     h5 Salir
+                            li.nav-item
+                                a.nav-link.text-warning(href="/Usuario/EditarPerfil")
+                                    h5 Editar Perfil
                         li.nav-item
                             a.nav-link(href="/Posts")
                                 h5 Subidas
@@ -77,6 +80,11 @@ html(lang="es")
                         option(value="Automotor") Autos, motos, y afines
                         option(value="Arte") Arte, dibujos, y manualidades
                         option(value="Diversión") Diversión variada
+                    br
+                    |Visibilidad&nbsp;
+                    select(name="Visibilidad")
+                        option(value="Público") Público
+                        option(value="Usuarios") Sólo usuarios
                 br
                 button.btn.btn-success(type="submit")
                     b ¡Subir!

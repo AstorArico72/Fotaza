@@ -9,11 +9,40 @@ exports.VerSubida = async (req, res, _next) => {
     let ListadoLicencias = require ("../Publico/Licencias.json");
     let ListadoCategorías = require ("../Publico/Categorías.json");
     let NumeroSubida = req.params.ID;
-    let PostSeleccionado = await Posts.findAll ({
-        where: {
-            ID: NumeroSubida
+    let PostSeleccionado;
+
+    let OnlineUser;
+    let OnlineUserId;
+    let UserRole;
+
+    if (typeof req.user !== "undefined") {
+        OnlineUser = req.user ["Usuario"];
+        OnlineUserId = req.user ["ID_Usuario"];
+        UserRole = req.user ["Rol_Usuario"];
+    } else {
+        OnlineUser = "NIL";
+        OnlineUserId = "NULL";
+    }
+
+    if (OnlineUser == "NIL") {
+        PostSeleccionado = await Posts.findAll ({
+            where: {
+                ID: NumeroSubida,
+                Visibilidad: "Público"
+            }
+        });
+        if (PostSeleccionado.length == 0) {
+            OtrasFunciones.PaginaErrorPug (res, 403, "Ésa subida está restringida a usuarios.");
+            return;
         }
-    });
+    } else {
+        PostSeleccionado = await Posts.findAll ({
+            where: {
+                ID: NumeroSubida
+            }
+        });
+    }
+
     if (PostSeleccionado.length != 0) {
         let Foto;
         if (PostSeleccionado [0].URL_Medios != null || PostSeleccionado [0].URL_Medios != undefined) {
@@ -33,9 +62,6 @@ exports.VerSubida = async (req, res, _next) => {
         });
 
         let NombreOP = AutorPost [0].Nombre_Usuario;
-        let OnlineUser;
-        let OnlineUserId;
-        let UserRole;
         let TagsPost;
         let LicenciaFoto;
         let Categoría = PostSeleccionado [0].Categoría_Post;
@@ -93,15 +119,6 @@ exports.VerSubida = async (req, res, _next) => {
                 break;
         }
 
-        if (typeof req.user !== "undefined") {
-            OnlineUser = req.user ["Usuario"];
-            OnlineUserId = req.user ["ID_Usuario"];
-            UserRole = req.user ["Rol_Usuario"];
-        } else {
-            OnlineUser = "NIL";
-            OnlineUserId = "NULL";
-        }
-
         let ComentariosPost = await Comentarios.findAll ({
             where: {
                 ID_Post: NumeroSubida
@@ -150,6 +167,17 @@ exports.VerSubida = async (req, res, _next) => {
 }
 
 exports.TodosLosPosts = async (req, res) => {
+    let OnlineUser;
+    let OnlineUserId;
+
+    if (typeof req.user !== "undefined") {
+        OnlineUser = req.user ["Usuario"];
+        OnlineUserId = req.user ["ID_Usuario"];
+    } else {
+        OnlineUser = "NIL";
+        OnlineUserId = "NULL";
+    }
+
     let ListadoCategorías = require ("../Publico/Categorías.json");
     let ListaSubidas = await Posts.findAll ({
         attributes: [
@@ -158,7 +186,8 @@ exports.TodosLosPosts = async (req, res) => {
             "Usuario",
             "ID",
             "Etiquetas_Post",
-            "Categoría_Post"
+            "Categoría_Post",
+            "Visibilidad"
         ],
         order: [
             ["createdAt", "DESC"]
@@ -194,18 +223,14 @@ exports.TodosLosPosts = async (req, res) => {
         ListaSubidas [i].Numero_OP= Numero_OP;
         ListaSubidas [i].Nombre_OP= Nombre_OP;
         ListaSubidas [i].Color_Fondo= ColorPost;
-        ListaPosts.push (ListaSubidas [i]);
-    }
 
-    let OnlineUser;
-    let OnlineUserId;
-
-    if (typeof req.user !== "undefined") {
-        OnlineUser = req.user ["Usuario"];
-        OnlineUserId = req.user ["ID_Usuario"];
-    } else {
-        OnlineUser = "NIL";
-        OnlineUserId = "NULL";
+        if (OnlineUser == "NIL" || OnlineUser == undefined) {
+            if (ListaSubidas [i].Visibilidad == "Público") {
+                ListaPosts.push (ListaSubidas [i]);
+            }
+        } else {
+            ListaPosts.push (ListaSubidas [i]);
+        }
     }
 
     let Listado = Pug.renderFile ("./Views/AllPosts.pug", {
@@ -235,6 +260,9 @@ exports.BuscarPosts = async (req, res) => {
         case "null" || undefined:
             SequelizeQuery += "`Posts`.`Etiquetas_Post` IS NULL ";
             break;
+        case "Todas":
+            SequelizeQuery += "`Posts`.`Etiquetas_Post` IS NOT NULL ";
+            break;
         default:
             SequelizeQuery += "`Posts`.`Etiquetas_Post` LIKE \"%" + req.query.Tag + "%\" ";
             break;
@@ -259,6 +287,14 @@ exports.BuscarPosts = async (req, res) => {
             break;
         default:
             SequelizeQuery += "AND `Posts`.`Licencia_Foto`=\"" + req.query.Licencia + "\" ";
+            break;
+    }
+    switch (req.query.Usuario) {
+        case "null" || undefined:
+            //Saltar el parámetro
+            break;
+        default:
+            SequelizeQuery += "AND `Posts`.`Usuario`=\"" + req.query.Usuario + "\" ";
             break;
     }
     SequelizeQuery += "ORDER BY `Posts`.`createdAt` DESC;";
@@ -314,7 +350,7 @@ exports.BuscarPosts = async (req, res) => {
         UploadList: ListaPosts,
         UsuarioConectado: OnlineUser,
         IdUsuarioConectado: OnlineUserId,
-        QueryBusqueda: "Etiqueta(s): " + req.query.Tag + ", Categoría: " + req.query.Categoria + ", Licencia: " + req.query.Licencia
+        QueryBusqueda: "Etiqueta(s): " + req.query.Tag + ", Categoría: " + req.query.Categoria + ", Licencia: " + req.query.Licencia + ", Usuario: " + req.query.Usuario
     });
     res.send (Listado);
 }
@@ -328,6 +364,7 @@ exports.NuevoPost = async (req, res) => {
     let DirectorioSubida = Path.join (__dirname, "../Medios");
     let Licencia;
     let Categoría;
+    let Visibilidad_Post;
     var CancelarSubida = false;
     const OpcionesFormulario = {
         keepExtensions: true,
@@ -371,6 +408,11 @@ exports.NuevoPost = async (req, res) => {
             } else {
                 Licencia = fields.Licencia [0];
             }
+            if (fields.Licencia [0] == "Copyright") {
+                Visibilidad_Post = "Usuarios";
+            } else {
+                Visibilidad_Post = fields.Visibilidad [0];
+            }
 
             if (files.PostMedia !== undefined) {
                 let Foto = files.PostMedia [0];
@@ -410,7 +452,8 @@ exports.NuevoPost = async (req, res) => {
                 URL_Medios: UrlMedios,
                 Etiquetas_Post: data ["EtiquetasPost"],
                 Licencia_Foto: Licencia,
-                Categoría_Post: Categoría
+                Categoría_Post: Categoría,
+                Visibilidad: Visibilidad_Post
             });
         }).then (()=> {
             res.redirect ("..");

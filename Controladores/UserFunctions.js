@@ -1,6 +1,7 @@
 const BCrypt = require ("bcrypt");
 const JWT = require ("jsonwebtoken");
-const {Usuarios} = require ("../models");
+const {Usuarios, Sequelize} = require ("../models");
+const Pug = require ("pug");
 var OtrasFunciones = require ("./OtrasFunciones.js");
 
 exports.Autenticador = async (req, res, next) => {
@@ -74,6 +75,7 @@ exports.NewUser = (async (req, res, next) => {
     let UserName = req.body.NombreUsuario;
     let UserPassword = req.body.ContraseñaUsuario;
     let RolUsuario = req.body.RolUsuario;
+    let PerfilUsuario = req.body.PerfilUsuario;
 
     //Ésto encripta la contraseña
     const salt = await BCrypt.genSalt(10);
@@ -91,12 +93,220 @@ exports.NewUser = (async (req, res, next) => {
             Usuarios.create ({
                 Nombre_Usuario: UserName,
                 Contraseña: NewPassword,
-                Rol: RolUsuario
+                Rol: RolUsuario,
+                Perfil_Usuario: PerfilUsuario
             });
             res.redirect (301, "../");
         } catch (error) {
             OtrasFunciones.PaginaErrorPug (res, 500, "Error con la creación de la cuenta: <br>" + error);
             return;
         }
+    }
+});
+
+exports.PerfilUsuario = (async (req, res, next) => {
+    let Perfil;
+    let OnlineUser;
+    let OnlineUserId;
+
+    if (typeof req.user !== "undefined") {
+        OnlineUser = req.user ["Usuario"];
+        OnlineUserId = req.user ["ID_Usuario"];
+    } else {
+        OnlineUser = "NIL";
+        OnlineUserId = "NULL";
+    }
+
+    let FoundUser = await Usuarios.findAll ({
+        attributes: [
+            "ID",
+            "Nombre_Usuario",
+            "createdAt",
+            "Rol",
+            "Perfil_Usuario"
+        ],
+        where: {
+            ID: req.params.ID
+        }
+    });
+
+    if (FoundUser.length == 0) {
+        OtrasFunciones.PaginaErrorPug (res, 404, "Ése usuario no existe.");
+    } else {
+        let NombreUsuario = FoundUser [0].Nombre_Usuario;
+        let IdUsuarioEncontrado = FoundUser [0].ID;
+        let FechaCreación = FoundUser [0].createdAt;
+        let DescripciónUsuario = FoundUser [0].Perfil_Usuario;
+        let RolUsuario = FoundUser [0].Rol;
+
+        Perfil = Pug.renderFile ("./Views/PerfilUsuario.pug", {
+            UsuarioConectado: OnlineUser,
+            IdUsuarioConectado: OnlineUserId,
+            UserName: NombreUsuario,
+            JoinDate: FechaCreación,
+            UserID: IdUsuarioEncontrado,
+            UserProfile: DescripciónUsuario,
+            UserRole: RolUsuario
+        });
+        res.send (Perfil);
+    }
+});
+
+exports.EditUser = (async (req, res, next) => {
+    let OnlineUser;
+    let OnlineUserId;
+    let Página;
+
+    if (typeof req.user !== "undefined") {
+        OnlineUser = req.user ["Usuario"];
+        OnlineUserId = req.user ["ID_Usuario"];
+    } else {
+        OnlineUser = "NIL";
+        OnlineUserId = "NULL";
+    }
+
+    let FoundUser = await Usuarios.findAll ({
+        attributes: [
+            "ID",
+            "Nombre_Usuario",
+            "createdAt",
+            "Rol",
+            "Perfil_Usuario"
+        ],
+        where: {
+            ID: OnlineUserId
+        }
+    });
+
+    if (OnlineUserId == "NULL") {
+        OtrasFunciones.PaginaErrorPug (res, 403, "Función no permitida.");
+    } else {
+        let NombreUsuario = FoundUser [0].Nombre_Usuario;
+        let DescripciónUsuario = FoundUser [0].Perfil_Usuario;
+        Página = Pug.renderFile ("./Views/EditarUsuario.pug", {
+            UsuarioConectado: OnlineUser,
+            IdUsuarioConectado: OnlineUserId,
+            UserName: NombreUsuario,
+            UserProfile: DescripciónUsuario
+        });
+        res.send (Página);
+    }
+});
+
+exports.SubirCambios = (async (req, res, next) => {
+    let OnlineUserId;
+    let IdUsuario = req.body.IdUsuario;
+
+    if (typeof req.user !== "undefined") {
+        OnlineUserId = req.user ["ID_Usuario"];
+    } else {
+        OnlineUserId = "NULL";
+    }
+
+    if (OnlineUserId == "NULL" || OnlineUserId != IdUsuario) {
+        OtrasFunciones.PaginaErrorPug (res, 403, "Función no permitida.");
+    }
+
+    let PerfilViejo = await Usuarios.findAll ({
+        attributes: [
+            "Nombre_Usuario",
+            "Perfil_Usuario"
+        ],
+        where: {
+            ID: OnlineUserId
+        }
+    });
+    let NombreViejo = PerfilViejo [0].Nombre_Usuario;
+    let UserName = req.body.NombreUsuario;
+    let PerfilUsuario = req.body.PerfilUsuario;
+
+    let Duplicado = await Usuarios.findAll ({
+        where: {
+            Nombre_Usuario: UserName
+        }
+    });
+    if (Duplicado.length > 0 && UserName != NombreViejo) {
+        OtrasFunciones.PaginaErrorPug (res, 400, "Ése nombre de usuario ya existe, intenta otro.");
+        return;
+    } else {
+        try {
+            Usuarios.findByPk (IdUsuario).then (user=> {
+                user.update ({
+                    Nombre_Usuario: UserName,
+                    Perfil_Usuario: PerfilUsuario
+                });
+            });
+            res.redirect (301, "/Usuario/Salir");
+        } catch (error) {
+            OtrasFunciones.PaginaErrorPug (res, error.httpCode, "Error con los cambios: <br>" + error);
+            return;
+        }
+    }
+});
+
+exports.CambiarClave = (async (req, res, next) => {
+    let OnlineUser;
+    let OnlineUserId;
+    let IdUsuario = req.body.IdUsuario;
+    let UserPassword = req.body.ContraseñaUsuario;
+
+    //Ésto encripta la contraseña
+    const salt = await BCrypt.genSalt(10);
+    const NewPassword = await BCrypt.hash(UserPassword, salt);
+
+    if (typeof req.user !== "undefined") {
+        OnlineUser = req.user ["Usuario"];
+        OnlineUserId = req.user ["ID_Usuario"];
+    } else {
+        OnlineUser = "NIL";
+        OnlineUserId = "NULL";
+    }
+
+    if (OnlineUserId == "NULL" || OnlineUserId != IdUsuario) {
+        OtrasFunciones.PaginaErrorPug (res, 403, "Función no permitida.");
+    } else {
+        try {
+            Usuarios.findByPk (IdUsuario).then (usuario => {
+                usuario.update ({
+                    Contraseña: NewPassword
+                });
+            });
+            res.redirect (301, "/Usuario/Salir");
+        } catch (error) {
+            OtrasFunciones.PaginaErrorPug (res, error.httpCode, "Error con los cambios: <br>" + error);
+            return;
+        }
+    }
+});
+
+exports.EditPassword = (async (req, res, next) => {
+    let OnlineUserId;
+    let Página;
+
+    if (typeof req.user !== "undefined") {
+        OnlineUserId = req.user ["ID_Usuario"];
+    } else {
+        OnlineUserId = "NULL";
+    }
+
+    let FoundUser = await Usuarios.findAll ({
+        attributes: [
+            "ID",
+            "Nombre_Usuario"
+        ],
+        where: {
+            ID: OnlineUserId
+        }
+    });
+
+    if (OnlineUserId == "NULL") {
+        OtrasFunciones.PaginaErrorPug (res, 403, "Función no permitida.");
+    } else {
+        let NombreUsuario = FoundUser [0].Nombre_Usuario;
+        Página = Pug.renderFile ("./Views/CambiarContraseña.pug", {
+            IdUsuarioConectado: OnlineUserId,
+            UserName: NombreUsuario
+        });
+        res.send (Página);
     }
 });
