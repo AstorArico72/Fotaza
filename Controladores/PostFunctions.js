@@ -1,4 +1,4 @@
-const {Usuarios, Posts, Comentarios, sequelize, Sequelize} = require ("../models");
+const {Usuarios, Posts, Comentarios, Votos, VotosUsuarios, sequelize, Sequelize} = require ("../models");
 const Pug = require ("pug");
 var OtrasFunciones = require ("./OtrasFunciones.js");
 const Path = require ("path");
@@ -10,10 +10,18 @@ exports.VerSubida = async (req, res, _next) => {
     let ListadoCategorías = require ("../Publico/Categorías.json");
     let NumeroSubida = req.params.ID;
     let PostSeleccionado;
-
+    let PuntuaciónPost;
+    let TotalVotos;
+    let VotosPost = await Votos.findAll ({
+        where: {
+            Post: NumeroSubida
+        }
+    });
     let OnlineUser;
     let OnlineUserId;
     let UserRole;
+    let PermitirVoto;
+    let VotoDelUsuario = null;
 
     if (typeof req.user !== "undefined") {
         OnlineUser = req.user ["Usuario"];
@@ -22,6 +30,39 @@ exports.VerSubida = async (req, res, _next) => {
     } else {
         OnlineUser = "NIL";
         OnlineUserId = "NULL";
+    }
+
+    if (OnlineUserId != "NULL" || OnlineUserId !== undefined) {
+        VotoDelUsuario = await VotosUsuarios.findAll ({
+            where: {
+                Usuario: OnlineUserId,
+                Post: NumeroSubida
+            }
+        });
+    }
+
+    if (VotoDelUsuario == null) {
+        PermitirVoto = false;
+    } else {
+        if (VotoDelUsuario.length == 0) {
+            PermitirVoto = true;
+        }
+    }
+
+    if (VotosPost.length == 0) {
+        PuntuaciónPost = null;
+    } else {
+        VotosPost = VotosPost [0];
+        let Votos5 = parseInt (VotosPost.Votos5);
+        let Votos4 = parseInt (VotosPost.Votos4);
+        let Votos3 = parseInt (VotosPost.Votos3);
+        let Votos2 = parseInt (VotosPost.Votos2);
+        let Votos1 = parseInt (VotosPost.Votos1);
+        let Votos0 = parseInt (VotosPost.Votos0);
+        let SumaPuntuacion = 5 * Votos5 + 4 * Votos4 + 3 * Votos3 + 2 * Votos2 + 1 * Votos1 + 0 * Votos0;
+        TotalVotos = Votos5 + Votos4 + Votos3 + Votos2 + Votos1 + Votos0;
+        PuntuaciónPost = SumaPuntuacion / TotalVotos;
+        PuntuaciónPost = PuntuaciónPost.toFixed (2);
     }
 
     if (OnlineUser == "NIL") {
@@ -157,7 +198,10 @@ exports.VerSubida = async (req, res, _next) => {
             Etiquetas: TagsPost,
             CategoríaPost: CategoríaPost,
             Comentarios: ListaComentarios,
-            ColorCategoría: ColorPrincipal
+            ColorCategoría: ColorPrincipal,
+            PuntuaciónPost: PuntuaciónPost,
+            VotosPost: TotalVotos,
+            PermitirVoto: PermitirVoto
         });
         res.send (FullPost);
     } else {
@@ -462,3 +506,71 @@ exports.NuevoPost = async (req, res) => {
             OtrasFunciones.PaginaErrorPug (res, 400, "Error con la subida:<br>" + error);
     }
 }
+
+exports.VotarPost = (async (req, res, next) => {
+    let OnlineUserId = req.user ["ID_Usuario"];
+    let PostId = req.body.PostId;
+    let VotoDelUsuario = await VotosUsuarios.findAll ({
+        where: {
+            Usuario: OnlineUserId,
+            Post: PostId
+        }
+    });
+    if (OnlineUserId == undefined) {
+        OtrasFunciones.PaginaErrorPug (res, 401, "No estás autenticado. <a href='/Usuario/Ingresar'>¿Ingresar?</a>");
+    }
+    let Voto = parseInt (req.body.rating);
+    let PostVotado = await Votos.findAll ({
+        where: {
+            Post: PostId
+        }
+    });
+    
+    if (VotoDelUsuario.length == 0) {
+        if (PostVotado.length == 0) {
+            PostVotado = await Votos.create ({
+                Post: PostId
+            });
+        } else {
+            PostVotado = PostVotado [0];
+        }
+        let SequelizeQuery = "UPDATE `Votos` SET";
+        try {
+            switch (Voto) {
+                case 5:
+                    SequelizeQuery += " `Votos5` = `Votos5` + 1 ";
+                    break;
+                case 4:
+                    SequelizeQuery += " `Votos4` = `Votos4` + 1 ";
+                    break;
+                case 3:
+                    SequelizeQuery += " `Votos3` = `Votos3` + 1 ";
+                    break;
+                case 2:
+                    SequelizeQuery += " `Votos2` = `Votos2` + 1 ";
+                    break;
+                case 1:
+                    SequelizeQuery += " `Votos1` = `Votos1` + 1 ";
+                    break;
+                case 0:
+                    SequelizeQuery += " `Votos0` = `Votos0` + 1 ";
+                    break;
+                default:
+                    break;
+            }
+            SequelizeQuery += "WHERE `Post` = " + PostId + ";";
+            sequelize.query (SequelizeQuery).then (()=> {
+                VotosUsuarios.create ({
+                    Usuario: OnlineUserId,
+                    Post: PostId
+                });
+            }).then (()=> {
+                res.redirect (301, "/Posts/Ver/" + PostId);
+            })
+        } catch (error) {
+            OtrasFunciones.PaginaErrorPug (res, error.httpCode || 500, error);
+        }
+    } else {
+        OtrasFunciones.PaginaErrorPug (res, 403, "Parece que ya has votado ése post.");
+    }
+});

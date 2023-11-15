@@ -5,6 +5,8 @@ html(lang="es")
         meta(http-equiv="X-UA-Compatible", content="IE=edge")
         meta(name="viewport", content="width=device-width, initial-scale=1.0")
         link(rel="stylesheet", href="/CSS", type="Text/CSS")
+        link(rel="stylesheet", href="/Estrellas", type="Text/CSS")
+        link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css", type="Text/CSS")
         title #{PostTitle} - Fotaza
         link(rel="icon", href="/favicon", type="image/x-icon")
     body
@@ -21,7 +23,7 @@ html(lang="es")
                                     a.nav-link.text-light(href="/Usuario/Ingresar") Iniciar Sesión
                         - else
                             li.nav-item
-                                a.nav-link.text-success(href=`/Usuario/${IdUsuarioConectado}`)
+                                a.nav-link.text-success(href=`/Usuario/Perfil/${IdUsuarioConectado}`)
                                     h4 #{UsuarioConectado}
                             li.nav-item
                                 a.nav-link.text-danger(href="/Usuario/Salir")
@@ -60,6 +62,39 @@ html(lang="es")
             br
         - else
             p.card.card-header.bg-warning No hay imágenes.
+        div.card.card-header#full-stars-example
+            - if (IdUsuarioConectado != "NULL" && PermitirVoto)
+                form(action="/Posts/Votar", method="post")
+                    input(type="hidden" name="PostId" value=`${PostNumber}`)
+                    div.rating-group
+                      input#rating-none.rating__input.rating__input--none(name='rating' value='0' type='radio' checked='true')
+                      label.rating__label(aria-label='No rating' for='rating-none')
+                        i.rating__icon.rating__icon--none.fa.fa-ban
+                      label.rating__label(aria-label='1 star' for='rating-1')
+                        i.rating__icon.rating__icon--star.fa.fa-star
+                      input#rating-1.rating__input(name='rating' value='1' type='radio')
+                      label.rating__label(aria-label='2 stars' for='rating-2')
+                        i.rating__icon.rating__icon--star.fa.fa-star
+                      input#rating-2.rating__input(name='rating' value='2' type='radio')
+                      label.rating__label(aria-label='3 stars' for='rating-3')
+                        i.rating__icon.rating__icon--star.fa.fa-star
+                      input#rating-3.rating__input(name='rating' value='3' type='radio')
+                      label.rating__label(aria-label='4 stars' for='rating-4')
+                        i.rating__icon.rating__icon--star.fa.fa-star
+                      input#rating-4.rating__input(name='rating' value='4' type='radio')
+                      label.rating__label(aria-label='5 stars' for='rating-5')
+                        i.rating__icon.rating__icon--star.fa.fa-star
+                      input#rating-5.rating__input(name='rating' value='5' type='radio')
+                    br
+                    button(type="submit").btn.btn-info Votar
+            - else if (IdUsuarioConectado != "NULL" && !PermitirVoto)
+                h4 Ya has votado éste post.
+            - else
+                h4 No estás autenticado.
+            - if (PuntuaciónPost == null)
+                h4 No hay votos
+            - else
+                h4 Puntuación: #{PuntuaciónPost} de 5 &#40;Votos: #{VotosPost}&#41;
         - if (IdUsuarioConectado != "NULL")
             div.card.text-center.bg-light.card-header
                 form(action="/Comentarios/Nuevo", method="post")
