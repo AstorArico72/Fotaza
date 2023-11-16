@@ -107,12 +107,16 @@ html(lang="es")
             br
         - if (Comentarios != null)
             div.card.bg-info.card-header
-                h3 Comentarios
+                h3 Comentarios: #{Comentarios.length}
                 each Comentario in Comentarios
-                    div.card.card-body
-                        h4 #{Comentario["NombreOP"]}
-                        h5 Subido el #{Comentario["FechaSubida"]}
-                        p!=Comentario["TextoComentario"]
+                    div.card.card-header.bg-success
+                        h4
+                            a(href=`/Usuario/Perfil/${Comentario["NumeroOP"]}`) #{Comentario["NombreOP"]}
+                            |,&nbsp;el #{Comentario["FechaSubida"]}&nbsp;
+                            - if (RolUsuario == "Admin")
+                                a(href=`/Comentarios/Borrar/${Comentario["NumeroComentario"]}`)
+                                    button.btn.btn-danger Borrar
+                        div.card.card-body!=Comentario["TextoComentario"]
         - else
             div.card.bg-info.card-header
                 h3 No hay comentarios

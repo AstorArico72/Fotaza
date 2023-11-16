@@ -30,8 +30,6 @@ APP.use ("/Documentos", Express.static ("Documentos", OpcionesDoc));
 APP.use ("/CSS", Express.static (__dirname + "/Publico/Sketchy-Bootswatch.css"));
 APP.use ("/Estrellas", Express.static (__dirname + "/Publico/CSS-estrellas.css"));
 APP.use ('/favicon', Express.static (__dirname + "/Publico/expressjs_logo_icon_169185.ico"));
-//Parece que no puedo manejar los archivos estáticos desde el controlador correspondiente.
-APP.use ('/Usuario/Ingresar', Express.static (__dirname + "/Publico/Login.html"));
 APP.use ('/Usuario/Nuevo', Express.static (__dirname + "/Publico/NuevoUsuario.html"));
 APP.use ("/Posts", RutasSubidas);
 APP.use ("/Usuario", RutasUsuario);

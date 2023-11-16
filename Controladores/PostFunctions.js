@@ -174,8 +174,10 @@ exports.VerSubida = async (req, res, _next) => {
                     }
                 });
                 ListaComentarios [i] = {
+                    NumeroComentario: ComentariosPost [i].ID,
                     TextoComentario: ComentariosPost [i].Texto_Comentario,
                     NombreOP: AutorComentario [0].Nombre_Usuario,
+                    NumeroOP: AutorComentario [0].ID,
                     FechaSubida: ComentariosPost [i].createdAt
                 }
             }
@@ -300,6 +302,7 @@ exports.BorrarPost = async (req, res) => {
 exports.BuscarPosts = async (req, res) => {
     let ListadoCategorías = require ("../Publico/Categorías.json");
     let SequelizeQuery = "SELECT `Título_Post`, `createdAt`, `Usuario`, `ID`, `Etiquetas_Post`, `Categoría_Post`, `Licencia_Foto` FROM `Posts` AS `Posts` WHERE ";
+    let Usuario = "Todos";
     switch (req.query.Tag) {
         case "null" || undefined:
             SequelizeQuery += "`Posts`.`Etiquetas_Post` IS NULL ";
@@ -334,11 +337,12 @@ exports.BuscarPosts = async (req, res) => {
             break;
     }
     switch (req.query.Usuario) {
-        case "null" || undefined:
+        case undefined:
             //Saltar el parámetro
             break;
         default:
             SequelizeQuery += "AND `Posts`.`Usuario`=\"" + req.query.Usuario + "\" ";
+            Usuario = req.query.Usuario;
             break;
     }
     SequelizeQuery += "ORDER BY `Posts`.`createdAt` DESC;";
@@ -394,7 +398,7 @@ exports.BuscarPosts = async (req, res) => {
         UploadList: ListaPosts,
         UsuarioConectado: OnlineUser,
         IdUsuarioConectado: OnlineUserId,
-        QueryBusqueda: "Etiqueta(s): " + req.query.Tag + ", Categoría: " + req.query.Categoria + ", Licencia: " + req.query.Licencia + ", Usuario: " + req.query.Usuario
+        QueryBusqueda: "Etiqueta(s): " + req.query.Tag + ", Categoría: " + req.query.Categoria + ", Licencia: " + req.query.Licencia + ", Usuario: " + Usuario
     });
     res.send (Listado);
 }

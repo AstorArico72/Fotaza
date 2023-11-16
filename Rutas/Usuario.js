@@ -12,3 +12,4 @@ ROUTER.get ("/EditarPerfil", FuncionesUsuario.Autenticador, FuncionesUsuario.Edi
 ROUTER.post ("/EditarCuenta", FuncionesUsuario.Autenticador, FuncionesUsuario.SubirCambios);
 ROUTER.get ("/CambiarClave", FuncionesUsuario.Autenticador, FuncionesUsuario.EditPassword);
 ROUTER.post ("/GuardarClave", FuncionesUsuario.Autenticador, FuncionesUsuario.CambiarClave);
+ROUTER.get ('/Ingresar', FuncionesUsuario.Autenticador, FuncionesUsuario.Ingresar);

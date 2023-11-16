@@ -1,33 +1,33 @@
 {
     "CC":{
         "BY":[
-            "<div class='card bg-info'> <p xmlns:cc='http://creativecommons.org/ns#'> Obra licenciada bajo <a href='http://creativecommons.org/licenses/by/4.0' target='_blank' rel='license noopener noreferrer' style='display:inline-block;'>Creative Commons Atribución 4.0 Internacional <img src='/Medios/CC/by.svg'></a></p> </div>"
+            "<div class='card bg-info card-body'> <p xmlns:cc='http://creativecommons.org/ns#'> <h3>Obra licenciada bajo <a href='http://creativecommons.org/licenses/by/4.0' target='_blank' rel='license noopener noreferrer' style='display:inline-block;'>Creative Commons Atribución 4.0 Internacional <img src='/Medios/CC/by.svg'></a></h3></p> </div>"
         ],
         "BY-SA":[
-            "<div class='card bg-info'><p xmlns:cc='http://creativecommons.org/ns#' >Obra licenciada bajo <a href='http://creativecommons.org/licenses/by-sa/4.0/' target='_blank' rel='license noopener noreferrer' style='display:inline-block;'>Creative Commons Atribución Compartir Igual 4.0 Internacional <img src='/Medios/CC/by-sa.svg'></a></p></div>"
+            "<div class='card bg-info card-body'><p xmlns:cc='http://creativecommons.org/ns#'> <h3>Obra licenciada bajo <a href='http://creativecommons.org/licenses/by-sa/4.0/' target='_blank' rel='license noopener noreferrer' style='display:inline-block;'>Creative Commons Atribución Compartir Igual 4.0 Internacional <img src='/Medios/CC/by-sa.svg'></a></h3></p></div>"
         ],
         "BY-NC":[
-            "<div class='card bg-warning'><p xmlns:cc='http://creativecommons.org/ns#'>Obra licenciada bajo <a href='http://creativecommons.org/licenses/by-nc/4.0/' target='_blank' rel='license noopener noreferrer' style='display:inline-block;'>Creative Commons Atribución No-Comercial 4.0 Internacional <img src='/Medios/CC/by-nc.svg'></a></p></div>"
+            "<div class='card bg-warning card-body'><p xmlns:cc='http://creativecommons.org/ns#'><h3>Obra licenciada bajo <a href='http://creativecommons.org/licenses/by-nc/4.0/' target='_blank' rel='license noopener noreferrer' style='display:inline-block;'>Creative Commons Atribución No-Comercial 4.0 Internacional <img src='/Medios/CC/by-nc.svg'></a></h3></p></div>"
         ],
         "BY-ND":[
-            "<div class='card bg-danger'><p xmlns:cc='http://creativecommons.org/ns#'>Obra licenciada bajo <a href='http://creativecommons.org/licenses/by-nd/4.0/' target='_blank' rel='license noopener noreferrer' style='display:inline-block;'>Creative Commons Atribución Sin Derivados 4.0 Internacional <img src='/Medios/CC/by-nd.svg'></a></p></div>"
+            "<div class='card bg-danger card-body'><p xmlns:cc='http://creativecommons.org/ns#'><h3>Obra licenciada bajo <a href='http://creativecommons.org/licenses/by-nd/4.0/' target='_blank' rel='license noopener noreferrer' style='display:inline-block;'>Creative Commons Atribución Sin Derivados 4.0 Internacional <img src='/Medios/CC/by-nd.svg'></a></h3></p></div>"
         ],
         "BY-NC-ND":[
-            "<div class='card bg-danger'><p xmlns:cc='http://creativecommons.org/ns#'> Obra licenciada bajo <a href='http://creativecommons.org/licenses/by-nc-nd/4.0/' target='_blank' rel='license noopener noreferrer' style='display:inline-block;'>Creative Commons Atribución No-Comercial Sin Derivados 4.0 Internacional <img src='/Medios/CC/by-nc-nd.svg'></a></p> </div>"
+            "<div class='card bg-danger card-body'><p xmlns:cc='http://creativecommons.org/ns#'> <h3>Obra licenciada bajo <a href='http://creativecommons.org/licenses/by-nc-nd/4.0/' target='_blank' rel='license noopener noreferrer' style='display:inline-block;'>Creative Commons Atribución No-Comercial Sin Derivados 4.0 Internacional <img src='/Medios/CC/by-nc-nd.svg'></a></h3></p> </div>"
         ],
         "BY-NC-SA":[
-            "<div class='card bg-warning'><p xmlns:cc='http://creativecommons.org/ns#'>Obra licenciada bajo <a href='http://creativecommons.org/licenses/by-nc-sa/4.0/' target='_blank' rel='license noopener noreferrer' style='display:inline-block;'>Creative Commons Atribución No-Comercial Compartir Igual 4.0 Internacional <img src='/Medios/CC/by-nc-sa.svg'></a></p> </div>"
+            "<div class='card bg-warning card-body'><p xmlns:cc='http://creativecommons.org/ns#'><h3>Obra licenciada bajo <a href='http://creativecommons.org/licenses/by-nc-sa/4.0/' target='_blank' rel='license noopener noreferrer' style='display:inline-block;'>Creative Commons Atribución No-Comercial Compartir Igual 4.0 Internacional <img src='/Medios/CC/by-nc-sa.svg'></a></h3></p> </div>"
         ]
     },
     "Public":{
         "CC0":[
-            "<div class='card bg-success'><p xmlns:cc='http://creativecommons.org/ns#'> Obra dedicada al dominio público - <a href='http://creativecommons.org/publicdomain/zero/1.0' target='_blank' rel='license noopener noreferrer' style='display:inline-block;'>CC0 1.0 Universal <img src='/Medios/CC/cc-zero.svg'></a></p></div>"
+            "<div class='card bg-success card-body'><p xmlns:cc='http://creativecommons.org/ns#'> <h3>Obra dedicada al dominio público - <a href='http://creativecommons.org/publicdomain/zero/1.0' target='_blank' rel='license noopener noreferrer' style='display:inline-block;'>CC0 1.0 Universal <img src='/Medios/CC/cc-zero.svg'></a></h3></p></div>"
         ],
         "PD":[
-            "<div class='card bg-success'>Obra original bajo dominio público.</div>"
+            "<div class='card bg-success card-body'><h3>Obra original bajo dominio público.</h3></div>"
         ]
     },
     "Copyright":[
-        "<div class='card bg-danger'>El autor original se reserva todos los derechos. Publicado con permiso.</div>"
+        "<div class='card bg-danger card-body'>El autor original se reserva todos los derechos. Publicado con permiso.</div>"
     ]
 }

@@ -19,3 +19,15 @@ exports.NuevoComentario = async (req, res) => {
         return;
     }
 }
+
+exports.BorrarComentario = async (req, res) => {
+    if (req.user == undefined || req.user ["Rol_Usuario"] != "Admin") {
+        OtrasFunciones.PaginaErrorPug (res, 403, "Función no permitida.");
+    } else {
+        Comentarios.findByPk (req.params.ID).then (comment => {
+            comment.destroy ();
+        }).then (()=> {
+            res.redirect ("../Posts");
+        });
+    }
+}

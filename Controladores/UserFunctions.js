@@ -2,6 +2,7 @@ const BCrypt = require ("bcrypt");
 const JWT = require ("jsonwebtoken");
 const {Usuarios, Sequelize} = require ("../models");
 const Pug = require ("pug");
+const Path = require ("path");
 var OtrasFunciones = require ("./OtrasFunciones.js");
 
 exports.Autenticador = async (req, res, next) => {
@@ -33,6 +34,19 @@ exports.LogOut = (async (req, res, next)=> {
     });
     res.redirect ("..");
     return next ();
+});
+
+exports.Ingresar = (async (req, res, next) => {
+    let OnlineUserId;
+    let OnlineUser;
+
+    if (typeof req.user !== "undefined") {
+        OnlineUser = req.user ["Usuario"];
+        OnlineUserId = req.user ["ID_Usuario"];
+        return res.redirect (301, "/Home");
+    } else {
+        res.sendFile ("Login.html", {root: Path.join (__dirname, "../Publico")});
+    }
 });
 
 exports.LogIn = (async (req, res, next) => {
