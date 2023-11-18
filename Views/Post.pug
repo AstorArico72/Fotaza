@@ -47,6 +47,7 @@ html(lang="es")
             h1 #{PostTitle}
             h2 Subido el #{PostDate} por&nbsp;
                 a(href=`/Usuario/Perfil/${OP_ID}`) #{OriginalPoster}
+        div.card.card.body(style=`background-color: ${ColorCategoría};`)
             h3 Subida ##{PostNumber}
             - if (Etiquetas != null)
                 h4 Etiquetas: #{Etiquetas}
@@ -56,13 +57,13 @@ html(lang="es")
                 a(href="/Documentos/Términos-de-uso-y-Licencias.html") &#40;más información aquí&#41;
             div!=License
             h4 Categoría: #{CategoríaPost}
-        div.card.card-header.bg-light!= PostContent
+        div.card.card-body.bg-light!= PostContent
         - if (UrlImagen !="/Medios/null")
             img.img-thumbnail(src=`${UrlImagen}`, alt=`Imagen del post #${PostNumber}`)
             br
         - else
             p.card.card-header.bg-warning No hay imágenes.
-        div.card.card-header#full-stars-example
+        div.card.card-body#full-stars-example
             - if (IdUsuarioConectado != "NULL" && PermitirVoto)
                 form(action="/Posts/Votar", method="post")
                     input(type="hidden" name="PostId" value=`${PostNumber}`)
@@ -116,7 +117,7 @@ html(lang="es")
                             - if (RolUsuario == "Admin")
                                 a(href=`/Comentarios/Borrar/${Comentario["NumeroComentario"]}`)
                                     button.btn.btn-danger Borrar
-                        div.card.card-body!=Comentario["TextoComentario"]
+                    div.card.card-body!=Comentario["TextoComentario"]
         - else
             div.card.bg-info.card-header
                 h3 No hay comentarios
@@ -125,6 +126,6 @@ html(lang="es")
             a(href=`/Posts/Borrar/${PostNumber}`)
                 button.btn.btn-danger
                     h4 Borrar post
-        div.card.bg-light.card-header
+        div.card.bg-light.card-body
             h3
                 a(href="/") Página principal

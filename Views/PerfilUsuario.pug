@@ -43,16 +43,17 @@ html(lang="es")
                                 h5 Guía de HTML y formato
         div.card.card-header
             h1 #{UserName}
+        div.card.card-body
             h2 Se unió el #{JoinDate}
             h3 ID ##{UserID}
             h3 Rol: #{UserRole}
             h4
                 a(href=`/Posts/Buscar?Usuario=${UserID}&Licencia=Todas&Categoria=Todas&Tag=Todas`) Ver subidas del usuario
         - if (UserProfile == null)
-            div.card.bg-light.card-header
+            div.card.bg-light.card-body
                 h3 Éste usuario no tiene descripción.
         - else
-            div.card.card-header.bg-light!=UserProfile
-        div.card.bg-light.card-header
+            div.card.card-body.bg-light!=UserProfile
+        div.card.bg-light.card-body
             h3
                 a(href="/") Página principal
