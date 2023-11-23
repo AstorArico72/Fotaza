@@ -52,7 +52,8 @@ html(lang="es")
                 p Licencia&nbsp;
                     a(href="/Documentos/Términos-de-uso-y-Licencias.html") &#40;Más información aquí&#41;&nbsp;
                     select(name="Licencia")
-                        option(disabled=true selected) Elige una
+                        option(disabled=true) Elige una
+                        option(value="" selected) Sin licencia
                         option(disabled=true) Contenido original o de un tercero
                         option(value="CC-BY") Creative Commons &#40;CC-BY 4.0&#41;
                         option(value="CC-BY-SA") Creative Commons Atribución Compartir Igual &#40;CC-BY-SA 4.0&#41;
@@ -68,9 +69,9 @@ html(lang="es")
                     br
                     |Categoría&nbsp;
                     select(name="Categoría")
-                        option(disabled=true selected) Elige una
+                        option(disabled=true) Elige una
                         //- Espero las comillas vacías sean tomadas como NULL y no como "null"
-                        option(value="") Sin categoría
+                        option(value="" selected) Sin categoría
                         option(value="Paisaje") Paisajes
                         option(value="Animales") Fauna
                         option(value="Plantas") Flora

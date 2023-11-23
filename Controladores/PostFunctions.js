@@ -73,7 +73,7 @@ exports.VerSubida = async (req, res, _next) => {
             }
         });
         if (PostSeleccionado.length == 0) {
-            OtrasFunciones.PaginaErrorPug (res, 403, "Ésa subida está restringida a usuarios.");
+            OtrasFunciones.PaginaErrorPug (res, 401, "Ésa subida está restringida a usuarios.");
             return;
         }
     } else {
@@ -443,23 +443,30 @@ exports.NuevoPost = async (req, res) => {
     let SubirDatos = new Promise ((resolve, reject) => {
         DatosSubidos.parse (req, (error, fields, files)=> {
             console.log (fields);
-            CamposFormulario ["TituloPost"] = fields.TituloPost [0];
             CamposFormulario ["SubidoPor"] = fields.SubidoPor [0];
             CamposFormulario ["TextoPost"] = fields.TextoPost [0];
-            if (fields.Categoría == undefined || fields.Categoría == "") {
+
+            //Revisiones de campos nulos
+            if (fields.TituloPost [0] == "" || fields.TituloPost == undefined) {
+                OtrasFunciones.PaginaErrorPug (res, 400, "Es necesario un título para la subida.");
+                return;
+            } else {
+                CamposFormulario ["TituloPost"] = fields.TituloPost [0];
+            }
+            if (fields.Categoría == "" || fields.Categoría == undefined) {
                 Categoría = null;
             } else {
                 Categoría = fields.Categoría [0];
             }
-            if (fields.Licencia == undefined || fields.Licencia == "") {
+            if (fields.Licencia == "" || fields.Licencia == undefined) {
                 Licencia = null;
             } else {
                 Licencia = fields.Licencia [0];
-            }
-            if (fields.Licencia [0] == "Copyright") {
-                Visibilidad_Post = "Usuarios";
-            } else {
-                Visibilidad_Post = fields.Visibilidad [0];
+                if (fields.Licencia [0] == "Copyright") {
+                    Visibilidad_Post = "Usuarios";
+                } else {
+                    Visibilidad_Post = fields.Visibilidad [0];
+                }
             }
 
             if (files.PostMedia !== undefined) {

@@ -193,7 +193,7 @@ exports.EditUser = (async (req, res, next) => {
     });
 
     if (OnlineUserId == "NULL") {
-        OtrasFunciones.PaginaErrorPug (res, 403, "Función no permitida.");
+        OtrasFunciones.PaginaErrorPug (res, 401, "Función no permitida.");
     } else {
         let NombreUsuario = FoundUser [0].Nombre_Usuario;
         let DescripciónUsuario = FoundUser [0].Perfil_Usuario;
