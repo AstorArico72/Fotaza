@@ -12,8 +12,9 @@ exports.NuevoComentario = async (req, res) => {
             ID_Post: PostNumber,
             ID_Usuario: OPNumber,
             Texto_Comentario: CommentText
+        }).then (()=> {
+            OtrasFunciones.PaginaErrorPug (res, 201, "Comentario publicado. <a href='/Posts/Ver/" + PostNumber + "'> Atrás </a>");
         });
-        res.redirect (301, "../Posts");
     } catch (error) {
         OtrasFunciones.PaginaErrorPug (res, 500, "Error con la creación de la cuenta: <br>" + error);
         return;
@@ -27,7 +28,7 @@ exports.BorrarComentario = async (req, res) => {
         Comentarios.findByPk (req.params.ID).then (comment => {
             comment.destroy ();
         }).then (()=> {
-            res.redirect ("../Posts");
+            OtrasFunciones.PaginaErrorPug (res, 200, "Comentario borrado.");
         });
     }
 }

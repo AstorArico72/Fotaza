@@ -16,10 +16,10 @@
         "Plantas": ["Chartreuse"],
         "Deportes": ["OrangeRed"],
         "Salud": ["Red"],
-        "Stock": ["White"],
+        "Stock": ["Gray"],
         "Automotor": ["LightSlateGrey"],
         "Arte": ["Magenta"],
         "Diversión": ["Blue"],
-        "Nada": ["DodgerBlue"]
+        "Nada": ["White"]
     }
 }

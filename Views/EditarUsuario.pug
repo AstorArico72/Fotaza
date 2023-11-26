@@ -14,7 +14,7 @@ html(lang="es")
                     ul.navbar-nav.flex-grow-1.align-items-center
                         li.nav-item
                             h2
-                                a.nav-link.text-dark(href="/Home") Fotaza
+                                a.nav-link.text-dark(href="/Posts") Fotaza
                         - if (IdUsuarioConectado == "NULL")
                             li.nav-item
                                 button.btn.btn-primary
@@ -42,7 +42,7 @@ html(lang="es")
             input#CampoNombre(class="form-control" type="text" max="255" name="NombreUsuario" placeholder="Nombre de usuario" value=`${UsuarioConectado}`)
             a(href="/Usuario/CambiarClave")
                 h3 Cambiar contraseña
-            label(for="Descripcion") Descripción
+            label(for="Descripcion") Descripción. Consulta la guía de HTML para dar formato al texto.
             textarea#Descripcion(class="form-control" rows="10" cols="50" name="PerfilUsuario" placeholder="Tu descripción")!=UserProfile
             button(type="submit" class="btn btn-success") Guardar cambios
         h3 La sesión será cerrada tras guardar los cambios.

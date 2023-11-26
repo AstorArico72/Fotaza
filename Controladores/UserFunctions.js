@@ -43,7 +43,7 @@ exports.Ingresar = (async (req, res, next) => {
     if (typeof req.user !== "undefined") {
         OnlineUser = req.user ["Usuario"];
         OnlineUserId = req.user ["ID_Usuario"];
-        return res.redirect (301, "/Home");
+        return res.redirect (301, "/");
     } else {
         res.sendFile ("Login.html", {root: Path.join (__dirname, "../Publico")});
     }

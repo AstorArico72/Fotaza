@@ -16,7 +16,7 @@ html(lang="es")
                     ul.navbar-nav.flex-grow-1.align-items-center
                         li.nav-item
                             h2
-                                a.nav-link.text-dark(href="/Home") Fotaza
+                                a.nav-link.text-dark(href="/Posts") Fotaza
                         - if (IdUsuarioConectado == "NULL")
                             li.nav-item
                                 button.btn.btn-primary
@@ -43,6 +43,8 @@ html(lang="es")
                         li.nav-item
                             a.nav-link(href="/Documentos/Guía-de-HTML-y-formato.html")
                                 h5 Guía de HTML y formato
+        - if (TarjetaMensaje != null)
+            div.sticky-top!=TarjetaMensaje
         div.card.card-header(style=`background-color: ${ColorCategoría};`)
             h1 #{PostTitle}
             h2 Subido el #{PostDate} por&nbsp;
@@ -88,8 +90,10 @@ html(lang="es")
                       input#rating-5.rating__input(name='rating' value='5' type='radio')
                     br
                     button(type="submit").btn.btn-info Votar
-            - else if (IdUsuarioConectado != "NULL" && !PermitirVoto)
+            - else if (IdUsuarioConectado != "NULL" && !PermitirVoto && !AutoVoto)
                 h4 Ya has votado éste post.
+            - else if (AutoVoto)
+                h4 No puedes votar tu propia subida.
             - else
                 h4 No estás autenticado.
             - if (PuntuaciónPost == null)
@@ -112,8 +116,12 @@ html(lang="es")
                 each Comentario in Comentarios
                     div.card.card-header.bg-success
                         h4
-                            a(href=`/Usuario/Perfil/${Comentario["NumeroOP"]}`) #{Comentario["NombreOP"]}
-                            |,&nbsp;el #{Comentario["FechaSubida"]}&nbsp;
+                            - if (Comentario ["NumeroOP"] == OP_ID)
+                                a(href=`/Usuario/Perfil/${Comentario["NumeroOP"]}`) #{Comentario["NombreOP"]}
+                                |&nbsp;[OP], el #{Comentario["FechaSubida"]}&nbsp;
+                            - else
+                                a(href=`/Usuario/Perfil/${Comentario["NumeroOP"]}`) #{Comentario["NombreOP"]}
+                                |, el #{Comentario["FechaSubida"]}&nbsp;
                             - if (RolUsuario == "Admin")
                                 a(href=`/Comentarios/Borrar/${Comentario["NumeroComentario"]}`)
                                     button.btn.btn-danger Borrar

@@ -12,6 +12,7 @@ exports.VerSubida = async (req, res, _next) => {
     let PostSeleccionado;
     let PuntuaciónPost;
     let TotalVotos;
+    let AutoVoto = false;
     let VotosPost = await Votos.findAll ({
         where: {
             Post: NumeroSubida
@@ -44,7 +45,16 @@ exports.VerSubida = async (req, res, _next) => {
     if (VotoDelUsuario == null) {
         PermitirVoto = false;
     } else {
-        if (VotoDelUsuario.length == 0) {
+        let OP = await Posts.findAll ({
+            attributes: ["ID", "Usuario"],
+            where: {
+                ID: NumeroSubida
+            }
+        });
+        if (OnlineUserId == OP [0].Usuario) {
+            PermitirVoto = false;
+            AutoVoto = true;
+        } else if (VotoDelUsuario.length == 0) {
             PermitirVoto = true;
         }
     }
@@ -203,7 +213,8 @@ exports.VerSubida = async (req, res, _next) => {
             ColorCategoría: ColorPrincipal,
             PuntuaciónPost: PuntuaciónPost,
             VotosPost: TotalVotos,
-            PermitirVoto: PermitirVoto
+            PermitirVoto: PermitirVoto,
+            AutoVoto: AutoVoto
         });
         res.send (FullPost);
     } else {
@@ -233,7 +244,8 @@ exports.TodosLosPosts = async (req, res) => {
             "ID",
             "Etiquetas_Post",
             "Categoría_Post",
-            "Visibilidad"
+            "Visibilidad",
+            "URL_Medios"
         ],
         order: [
             ["createdAt", "DESC"]
@@ -266,6 +278,9 @@ exports.TodosLosPosts = async (req, res) => {
                 ColorPost = ListadoCategorías.Colores [CategoríaPost];
                 break;
         }
+        if (ListaSubidas [i].URL_Medios == undefined || ListaSubidas [i].URL_Medios == null) {
+            ListaSubidas [i].URL_Medios = "/Medios/null";
+        }
         ListaSubidas [i].Numero_OP= Numero_OP;
         ListaSubidas [i].Nombre_OP= Nombre_OP;
         ListaSubidas [i].Color_Fondo= ColorPost;
@@ -294,14 +309,14 @@ exports.BorrarPost = async (req, res) => {
         Posts.findByPk (req.params.ID).then (post => {
             post.destroy ();
         }).then (()=> {
-            res.redirect ("..");
+            OtrasFunciones.PaginaErrorPug (res, 200, "Post borrado.");
         });
     }
 }
 
 exports.BuscarPosts = async (req, res) => {
     let ListadoCategorías = require ("../Publico/Categorías.json");
-    let SequelizeQuery = "SELECT `Título_Post`, `createdAt`, `Usuario`, `ID`, `Etiquetas_Post`, `Categoría_Post`, `Licencia_Foto` FROM `Posts` AS `Posts` WHERE ";
+    let SequelizeQuery = "SELECT `Título_Post`, `createdAt`, `Usuario`, `ID`, `Etiquetas_Post`, `Categoría_Post`, `Licencia_Foto`, `URL_Medios` FROM `Posts` AS `Posts` WHERE ";
     let Usuario = "Todos";
     switch (req.query.Tag) {
         case "null" || undefined:
@@ -376,6 +391,9 @@ exports.BuscarPosts = async (req, res) => {
             default:
                 ColorPost = ListadoCategorías.Colores [CategoríaPost];
                 break;
+        }
+        if (ListaSubidas [i].URL_Medios == undefined || ListaSubidas [i].URL_Medios == null) {
+            ListaSubidas [i].URL_Medios = "/Medios/null";
         }
         ListaSubidas [i].Numero_OP= Numero_OP;
         ListaSubidas [i].Nombre_OP= Nombre_OP;
@@ -511,16 +529,22 @@ exports.NuevoPost = async (req, res) => {
                 Visibilidad: Visibilidad_Post
             });
         }).then (()=> {
-            res.redirect ("..");
+            OtrasFunciones.PaginaErrorPug (res, 201, "Post subido.");
         })
     } catch (error) {
-            OtrasFunciones.PaginaErrorPug (res, 400, "Error con la subida:<br>" + error);
+        OtrasFunciones.PaginaErrorPug (res, 400, "Error con la subida:<br>" + error);
     }
 }
 
 exports.VotarPost = (async (req, res, next) => {
     let OnlineUserId = req.user ["ID_Usuario"];
     let PostId = req.body.PostId;
+    let OP = await Posts.findAll ({
+        attributes: ["ID", "Usuario"],
+        where: {
+            ID: PostId
+        }
+    });
     let VotoDelUsuario = await VotosUsuarios.findAll ({
         where: {
             Usuario: OnlineUserId,
@@ -529,6 +553,8 @@ exports.VotarPost = (async (req, res, next) => {
     });
     if (OnlineUserId == undefined) {
         OtrasFunciones.PaginaErrorPug (res, 401, "No estás autenticado. <a href='/Usuario/Ingresar'>¿Ingresar?</a>");
+    } else if (OnlineUserId == OP [0].Usuario) {
+        OtrasFunciones.PaginaErrorPug (res, 403, "No está permitido votar tu propio post.");
     }
     let Voto = parseInt (req.body.rating);
     let PostVotado = await Votos.findAll ({

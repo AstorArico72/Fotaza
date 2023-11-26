@@ -14,7 +14,7 @@ html(lang="es")
                     ul.navbar-nav.flex-grow-1.align-items-center
                         li.nav-item
                             h2
-                                a.nav-link.text-dark(href="/Home") Fotaza
+                                a.nav-link.text-dark(href="/Posts") Fotaza
                         - if (IdUsuarioConectado == "NULL")
                             li.nav-item
                                 button.btn.btn-primary
@@ -45,9 +45,13 @@ html(lang="es")
             form(action="/Posts/Nuevo", method="post", enctype="multipart/form-data")
                 input.input-group-text.form-control.fw-bold.input-group-lg(type="text", name="TituloPost", placeholder="Título")
                 input(type="hidden", name="SubidoPor", value=`${IdUsuarioConectado}`)
-                input.input-group-text.form-control.fw-bold.input-group-lg(type="text", name="TagsPost", placeholder="Etiquetas (Máximo 3)")
-                textarea.form-control(name="TextoPost", cols="50", rows="10", placeholder="Texto del post")
-                label(for="Foto") Foto &#40;Máximo 10 MiB&#41;
+                label(for="CampoEtiquetas") Las etiquetas se separan con una coma seguida de un espacio, por ejemplo: "tag1, tag2, tag3"
+                input.input-group-text.form-control.fw-bold.input-group-lg#CampoEtiquetas(type="text", name="TagsPost", placeholder="Etiquetas (Máximo 3)")
+                label(for="ContenidoPost") Consulta la guía de HTML para darle formato al texto.
+                textarea.form-control#ContenidoPost(name="TextoPost", cols="50", rows="10", placeholder="Texto del post")
+                label(for="Foto") Foto &#40;Máximo&nbsp;
+                    abbr(title="Megabytes binarios, también llamados mebibytes. 10 MiB = 10,485,760 B.") 10 MiB
+                    |&#41;. Tipos admitidos: JPEG, BMP, PNG, SVG.
                 input.form-control#Foto(type="file", name="PostMedia")
                 p Licencia&nbsp;
                     a(href="/Documentos/Términos-de-uso-y-Licencias.html") &#40;Más información aquí&#41;&nbsp;

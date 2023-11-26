@@ -1,18 +1,10 @@
 const Express = require ("express");
 const ROUTER = Express.Router ();
-const { Autenticador } = require("../Controladores/UserFunctions");
+//const { Autenticador } = require("../Controladores/UserFunctions");
 var OtrasFunciones = require("../Controladores/OtrasFunciones.js");
 
-ROUTER.get ("/Home", Autenticador, (req, res, next)=> {
-    OtrasFunciones.CargarPaginaPugBasica (req, res, "./Views/Home.pug");
-});
-
-ROUTER.get ("/home", (_req, res, next)=> {
-    res.redirect (301, "/Home");
-});
-
 ROUTER.get ("/", (_req, res, next)=> {
-    res.redirect (301, "/Home");
+    res.redirect (301, "/Posts");
 });
 
 ROUTER.get ("*", (req, res, next)=> {

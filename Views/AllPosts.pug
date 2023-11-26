@@ -14,7 +14,7 @@ html(lang="es")
                     ul.navbar-nav.flex-grow-1.align-items-center
                         li.nav-item
                             h2
-                                a.nav-link.text-dark(href="/Home") Fotaza
+                                a.nav-link.text-dark(href="/Posts") Fotaza
                         - if (IdUsuarioConectado == "NULL")
                             li.nav-item
                                 button.btn.btn-primary
@@ -72,7 +72,8 @@ html(lang="es")
                                         option(value="Public") Dominio Público
                                         option(value="null") Sin licencia
                                     button.btn.btn-success(type="submit") Buscar
-
+        - if (TarjetaMensaje != null)
+            div.sticky-top!=TarjetaMensaje
         - if (QueryBusqueda != null)
             h2 Búsqueda: "#{QueryBusqueda}"
             h3 Resultados: #{UploadList.length}
@@ -82,13 +83,16 @@ html(lang="es")
         - if (UploadList.length != 0)
             each Upload in UploadList
                 div.card.card-header(style=`background-color: ${Upload ["Color_Fondo"]};`)
-                    h3
-                        a(href=`/Posts/Ver/${Upload ["ID"]}`) #{Upload ["Título_Post"]}
-                    h4 Subido el #{Upload ["createdAt"]} por&nbsp;
-                        a(href=`/Usuario/Perfil/${Upload ["Numero_OP"]}`) #{Upload ["Nombre_OP"]}
-                    if (Upload ["Etiquetas"] != null)
-                        h5 Etiquetas: #{Upload ["Etiquetas"]}
-                    else
-                        h5 Sin etiquetas
+                    div
+                        - if (Upload ["URL_Medios"] !="/Medios/null")
+                            img.img-thumbnail.float-start(src=`${Upload ["URL_Medios"]}`, alt=`Imagen del post #${Upload ["ID"]}`, width=128, height=128)
+                        h3
+                            a(href=`/Posts/Ver/${Upload ["ID"]}`) #{Upload ["Título_Post"]}
+                        h4 Subido el #{Upload ["createdAt"]} por&nbsp;
+                            a(href=`/Usuario/Perfil/${Upload ["Numero_OP"]}`) #{Upload ["Nombre_OP"]}
+                        - if (Upload ["Etiquetas"] != null)
+                            h5 Etiquetas: #{Upload ["Etiquetas"]}
+                        - else
+                            h5 Sin etiquetas
         - else
             h2 No hay resultados
