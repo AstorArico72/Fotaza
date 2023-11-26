@@ -4,6 +4,15 @@ var OtrasFunciones = require ("./OtrasFunciones.js");
 const Path = require ("path");
 const FS = require ("fs");
 const {formidable, errors} = require ("formidable");
+const FormatoFecha = {
+    hour12: true,
+    day: "numeric",
+    month: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    second: "2-digit"
+}
 
 exports.VerSubida = async (req, res, _next) => {
     let ListadoLicencias = require ("../Publico/Licencias.json");
@@ -103,7 +112,7 @@ exports.VerSubida = async (req, res, _next) => {
         }
         let ContenidoPost = PostSeleccionado [0].Texto_Post;
         let TituloPost = PostSeleccionado [0].Título_Post;
-        let FechaSubida = PostSeleccionado [0].createdAt;
+        let FechaSubida = PostSeleccionado [0].createdAt.toLocaleDateString ("es-US", FormatoFecha);
         let IdAutor = PostSeleccionado [0].Usuario;
         let Licencia = PostSeleccionado [0].Licencia_Foto;
         let AutorPost = await Usuarios.findAll ({
@@ -188,7 +197,7 @@ exports.VerSubida = async (req, res, _next) => {
                     TextoComentario: ComentariosPost [i].Texto_Comentario,
                     NombreOP: AutorComentario [0].Nombre_Usuario,
                     NumeroOP: AutorComentario [0].ID,
-                    FechaSubida: ComentariosPost [i].createdAt
+                    FechaSubida: ComentariosPost [i].createdAt.toLocaleDateString ("es-US", FormatoFecha)
                 }
             }
         } else {
@@ -284,6 +293,7 @@ exports.TodosLosPosts = async (req, res) => {
         ListaSubidas [i].Numero_OP= Numero_OP;
         ListaSubidas [i].Nombre_OP= Nombre_OP;
         ListaSubidas [i].Color_Fondo= ColorPost;
+        ListaSubidas [i].FechaSubida= ListaSubidas [i].createdAt.toLocaleDateString ("es-US", FormatoFecha);
 
         if (OnlineUser == "NIL" || OnlineUser == undefined) {
             if (ListaSubidas [i].Visibilidad == "Público") {
@@ -398,6 +408,7 @@ exports.BuscarPosts = async (req, res) => {
         ListaSubidas [i].Numero_OP= Numero_OP;
         ListaSubidas [i].Nombre_OP= Nombre_OP;
         ListaSubidas [i].Color_Fondo= ColorPost;
+        ListaSubidas [i].FechaSubida= ListaSubidas [i].createdAt.toLocaleDateString ("es-US", FormatoFecha);
         ListaPosts.push (ListaSubidas [i]);
     }
 
@@ -611,3 +622,115 @@ exports.VotarPost = (async (req, res, next) => {
         OtrasFunciones.PaginaErrorPug (res, 403, "Parece que ya has votado ése post.");
     }
 });
+
+exports.PostsDestacados = async (req, res) => {
+    let OnlineUser;
+    let OnlineUserId;
+
+    if (typeof req.user !== "undefined") {
+        OnlineUser = req.user ["Usuario"];
+        OnlineUserId = req.user ["ID_Usuario"];
+    } else {
+        OnlineUser = "NIL";
+        OnlineUserId = "NULL";
+    }
+
+    let ListadoCategorías = require ("../Publico/Categorías.json");
+    let ListaSubidas = await Posts.findAll ({
+        attributes: [
+            "Título_Post",
+            "createdAt",
+            "Usuario",
+            "ID",
+            "Etiquetas_Post",
+            "Categoría_Post",
+            "Visibilidad",
+            "URL_Medios"
+        ],
+        order: [
+            ["createdAt", "DESC"]
+        ],
+        where: {
+            createdAt: {
+                [Sequelize.Op.lt]: new Date (),
+                [Sequelize.Op.gt]: new Date (new Date () - 7 * 24 * 60 * 60 * 1000)
+            }
+        }
+    });
+
+    let ListaPosts = [];
+    let SeparadorComa = new RegExp (/\,\s/, "g");
+
+    for (let i= 0; i< ListaSubidas.length; i++) {
+        let OP = await Usuarios.findAll ({
+            where: {
+                id: ListaSubidas [i].Usuario
+            }
+        });
+        let Numero_OP = OP [0].id;
+        let Nombre_OP = OP [0].Nombre_Usuario;
+        if (ListaSubidas [i].Etiquetas_Post != null) {
+            let Tags = ListaSubidas [i].Etiquetas_Post.split (SeparadorComa);
+            ListaSubidas [i].Etiquetas= Tags.join (", ");
+        }
+        let CategoríaPost = ListaSubidas [i].Categoría_Post;
+        let ColorPost;
+        switch (CategoríaPost) {
+            case null:
+                ColorPost = ListadoCategorías.Colores.Nada;
+                break;
+        
+            default:
+                ColorPost = ListadoCategorías.Colores [CategoríaPost];
+                break;
+        }
+        if (ListaSubidas [i].URL_Medios == undefined || ListaSubidas [i].URL_Medios == null) {
+            ListaSubidas [i].URL_Medios = "/Medios/null";
+        }
+        ListaSubidas [i].Numero_OP= Numero_OP;
+        ListaSubidas [i].Nombre_OP= Nombre_OP;
+        ListaSubidas [i].Color_Fondo= ColorPost;
+        ListaSubidas [i].FechaSubida= ListaSubidas [i].createdAt.toLocaleDateString ("es-US", FormatoFecha);
+
+        let VotosPost = await Votos.findAll ({
+            where: {
+                Post: ListaSubidas [i].ID
+            }
+        });
+
+        if (VotosPost.length != 0) {
+            VotosPost = VotosPost [0];
+            let Votos5 = parseInt (VotosPost.Votos5);
+            let Votos4 = parseInt (VotosPost.Votos4);
+            let Votos3 = parseInt (VotosPost.Votos3);
+            let Votos2 = parseInt (VotosPost.Votos2);
+            let Votos1 = parseInt (VotosPost.Votos1);
+            let Votos0 = parseInt (VotosPost.Votos0);
+            let SumaPuntuacion = 5 * Votos5 + 4 * Votos4 + 3 * Votos3 + 2 * Votos2 + 1 * Votos1 + 0 * Votos0;
+            TotalVotos = Votos5 + Votos4 + Votos3 + Votos2 + Votos1 + Votos0;
+            let PuntuaciónPost = SumaPuntuacion / TotalVotos;
+            ListaSubidas [i].PuntuaciónPost = PuntuaciónPost.toFixed (2);
+            ListaSubidas [i].TotalVotos = TotalVotos;
+
+            if (OnlineUser == "NIL" || OnlineUser == undefined) {
+                if (ListaSubidas [i].Visibilidad == "Público") {
+                    if (ListaSubidas [i].PuntuaciónPost >= 4 && ListaSubidas [i].TotalVotos >= 50) {
+                        ListaPosts.push (ListaSubidas [i]);
+                    }
+                }
+            } else {
+                if (ListaSubidas [i].PuntuaciónPost >= 4 && ListaSubidas [i].TotalVotos >= 50) {
+                    ListaPosts.push (ListaSubidas [i]);
+                }
+            }
+        }
+    }
+
+    let Listado = Pug.renderFile ("./Views/AllPosts.pug", {
+        UploadList: ListaPosts,
+        UsuarioConectado: OnlineUser,
+        IdUsuarioConectado: OnlineUserId,
+        PostsDestacados: true
+    });
+    res.send (Listado);
+}

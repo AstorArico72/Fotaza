@@ -9,5 +9,6 @@ ROUTER.get ("/Ver/:ID", Auth.Autenticador, FuncionesPost.VerSubida);
 ROUTER.get ("/Subir", Auth.Autenticador, FuncionesPost.PaginaSubida);
 ROUTER.get ("/Borrar/:ID", Auth.Autenticador, FuncionesPost.BorrarPost);
 ROUTER.get ("/Buscar", Auth.Autenticador, FuncionesPost.BuscarPosts);
+ROUTER.get ("/Destacados", Auth.Autenticador, FuncionesPost.PostsDestacados);
 ROUTER.post ("/Nuevo", Auth.Autenticador, FuncionesPost.NuevoPost);
 ROUTER.post ("/Votar", Auth.Autenticador, FuncionesPost.VotarPost);
