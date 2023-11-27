@@ -24,6 +24,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/Posts/Destacados">Subidas</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/Documentos/Guía-de-Markdown-y-formato.html">Guía de Markdown y formato</a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -34,7 +37,8 @@
         <input type="hidden" name="RolUsuario" value="User"/>
         <input class="form-control" type="text" max="255" name="NombreUsuario" placeholder="Nombre de usuario"/><br>
         <input class="form-control" type="password" max="255" name="ContraseñaUsuario" placeholder="Contraseña"/><br>
-        <textarea class="form-control" rows="10" cols="50" name="PerfilUsuario" placeholder="Tu descripción"></textarea> <br>
+        <label for="DescripcionUsuario">Revisa la Guía de Markdown antes de añadir una descripción a tu perfil.</label>
+        <textarea class="form-control" rows="10" cols="50" name="PerfilUsuario" placeholder="Tu descripción" id="DescripcionUsuario"></textarea> <br>
         <button type="submit" class="btn btn-success"> Nueva Cuenta </button>
     </form>
 </body>

@@ -4,6 +4,8 @@ var OtrasFunciones = require ("./OtrasFunciones.js");
 const Path = require ("path");
 const FS = require ("fs");
 const {formidable, errors} = require ("formidable");
+const Marked = require ("marked");
+const SanitizeHTML = require ("sanitize-html");
 const FormatoFecha = {
     hour12: true,
     day: "numeric",
@@ -12,21 +14,37 @@ const FormatoFecha = {
     hour: "numeric",
     minute: "2-digit",
     second: "2-digit"
-}
+};
+const OpcionesSanitizado = {
+    allowedTags: [
+        "h1", "h2", "h3", "h4",
+        "h5", "h6", "blockquote", "dd", "div",
+        "dl", "dt", "hr", "li", "ol", "p", "pre",
+        "ul", "a", "abbr", "b", "br", "code",
+        "em", "i", "span", "strong", "table", "tbody", "td", "tfoot", "th", "thead", "tr", "img", "b", "strong",
+        "video", "audio", "style"
+      ],
+    nonBooleanAttributes: [
+        "class", "colspan", "rowspan", "cols", "rows", "alt", "type", "height", "width", "iframe", "src", "href", "title", "media"
+    ],
+    allowedSchemes: [ 'http', 'https', 'mailto', 'tel' ],
+    allowedAttributes: {
+        a: ["href", "title", "target"],
+        img: [ 'src', 'alt', 'title', 'width', 'height'],
+        iframe: ["src", "width", "height"],
+        video: [ 'src', 'alt', 'title', 'width', 'height', "autoplay", "muted"],
+        audio: [ 'src', 'alt', 'title', 'width', 'height', "autoplay", "muted"],
+    },
+    parseStyleAttributes: true,
+    disallowedTagsMode: 'discard'
+};
 
 exports.VerSubida = async (req, res, _next) => {
     let ListadoLicencias = require ("../Publico/Licencias.json");
     let ListadoCategorías = require ("../Publico/Categorías.json");
     let NumeroSubida = req.params.ID;
     let PostSeleccionado;
-    let PuntuaciónPost;
-    let TotalVotos;
     let AutoVoto = false;
-    let VotosPost = await Votos.findAll ({
-        where: {
-            Post: NumeroSubida
-        }
-    });
     let OnlineUser;
     let OnlineUserId;
     let UserRole;
@@ -68,21 +86,7 @@ exports.VerSubida = async (req, res, _next) => {
         }
     }
 
-    if (VotosPost.length == 0) {
-        PuntuaciónPost = null;
-    } else {
-        VotosPost = VotosPost [0];
-        let Votos5 = parseInt (VotosPost.Votos5);
-        let Votos4 = parseInt (VotosPost.Votos4);
-        let Votos3 = parseInt (VotosPost.Votos3);
-        let Votos2 = parseInt (VotosPost.Votos2);
-        let Votos1 = parseInt (VotosPost.Votos1);
-        let Votos0 = parseInt (VotosPost.Votos0);
-        let SumaPuntuacion = 5 * Votos5 + 4 * Votos4 + 3 * Votos3 + 2 * Votos2 + 1 * Votos1 + 0 * Votos0;
-        TotalVotos = Votos5 + Votos4 + Votos3 + Votos2 + Votos1 + Votos0;
-        PuntuaciónPost = SumaPuntuacion / TotalVotos;
-        PuntuaciónPost = PuntuaciónPost.toFixed (2);
-    }
+    let ConjuntoResultados = CalcularPuntuación (NumeroSubida);
 
     if (OnlineUser == "NIL") {
         PostSeleccionado = await Posts.findAll ({
@@ -110,7 +114,8 @@ exports.VerSubida = async (req, res, _next) => {
         } else {
             Foto = "/Medios/null";
         }
-        let ContenidoPost = PostSeleccionado [0].Texto_Post;
+        let MarkdownSucio = Marked.parse (PostSeleccionado [0].Texto_Post);
+        let ContenidoPost = SanitizeHTML (MarkdownSucio, OpcionesSanitizado);
         let TituloPost = PostSeleccionado [0].Título_Post;
         let FechaSubida = PostSeleccionado [0].createdAt.toLocaleDateString ("es-US", FormatoFecha);
         let IdAutor = PostSeleccionado [0].Usuario;
@@ -192,9 +197,11 @@ exports.VerSubida = async (req, res, _next) => {
                         ID: ComentariosPost [i].ID_Usuario
                     }
                 });
+                let ComentarioCrudo = ComentariosPost [i].Texto_Comentario;
+                let MarkdownParseado = Marked.parse (ComentarioCrudo);
                 ListaComentarios [i] = {
                     NumeroComentario: ComentariosPost [i].ID,
-                    TextoComentario: ComentariosPost [i].Texto_Comentario,
+                    TextoComentario: SanitizeHTML (MarkdownParseado, OpcionesSanitizado),
                     NombreOP: AutorComentario [0].Nombre_Usuario,
                     NumeroOP: AutorComentario [0].ID,
                     FechaSubida: ComentariosPost [i].createdAt.toLocaleDateString ("es-US", FormatoFecha)
@@ -220,8 +227,8 @@ exports.VerSubida = async (req, res, _next) => {
             CategoríaPost: CategoríaPost,
             Comentarios: ListaComentarios,
             ColorCategoría: ColorPrincipal,
-            PuntuaciónPost: PuntuaciónPost,
-            VotosPost: TotalVotos,
+            PuntuaciónPost: (await ConjuntoResultados).Puntuación,
+            VotosPost: (await ConjuntoResultados).NumeroVotos,
             PermitirVoto: PermitirVoto,
             AutoVoto: AutoVoto
         });
@@ -691,27 +698,10 @@ exports.PostsDestacados = async (req, res) => {
         ListaSubidas [i].Nombre_OP= Nombre_OP;
         ListaSubidas [i].Color_Fondo= ColorPost;
         ListaSubidas [i].FechaSubida= ListaSubidas [i].createdAt.toLocaleDateString ("es-US", FormatoFecha);
-
-        let VotosPost = await Votos.findAll ({
-            where: {
-                Post: ListaSubidas [i].ID
-            }
-        });
-
-        if (VotosPost.length != 0) {
-            VotosPost = VotosPost [0];
-            let Votos5 = parseInt (VotosPost.Votos5);
-            let Votos4 = parseInt (VotosPost.Votos4);
-            let Votos3 = parseInt (VotosPost.Votos3);
-            let Votos2 = parseInt (VotosPost.Votos2);
-            let Votos1 = parseInt (VotosPost.Votos1);
-            let Votos0 = parseInt (VotosPost.Votos0);
-            let SumaPuntuacion = 5 * Votos5 + 4 * Votos4 + 3 * Votos3 + 2 * Votos2 + 1 * Votos1 + 0 * Votos0;
-            TotalVotos = Votos5 + Votos4 + Votos3 + Votos2 + Votos1 + Votos0;
-            let PuntuaciónPost = SumaPuntuacion / TotalVotos;
-            ListaSubidas [i].PuntuaciónPost = PuntuaciónPost.toFixed (2);
-            ListaSubidas [i].TotalVotos = TotalVotos;
-
+        let Puntuación = CalcularPuntuación (ListaSubidas [i].ID);
+        if ((await Puntuación).NumeroVotos != null) {
+            ListaSubidas [i].PuntuaciónPost = (await Puntuación).Puntuación;
+            ListaSubidas [i].TotalVotos = (await Puntuación).NumeroVotos;
             if (OnlineUser == "NIL" || OnlineUser == undefined) {
                 if (ListaSubidas [i].Visibilidad == "Público") {
                     if (ListaSubidas [i].PuntuaciónPost >= 4 && ListaSubidas [i].TotalVotos >= 50) {
@@ -733,4 +723,31 @@ exports.PostsDestacados = async (req, res) => {
         PostsDestacados: true
     });
     res.send (Listado);
+}
+
+async function CalcularPuntuación (PostID) {
+    let VotosPost = await Votos.findAll ({
+        where: {
+            Post: PostID
+        }
+    });
+    let Resultado = {
+        Puntuación: null,
+        NumeroVotos: null
+    };
+    if (VotosPost.length != 0) {
+        VotosPost = VotosPost [0];
+        let Votos5 = parseInt (VotosPost.Votos5);
+        let Votos4 = parseInt (VotosPost.Votos4);
+        let Votos3 = parseInt (VotosPost.Votos3);
+        let Votos2 = parseInt (VotosPost.Votos2);
+        let Votos1 = parseInt (VotosPost.Votos1);
+        let Votos0 = parseInt (VotosPost.Votos0);
+        let SumaPuntuacion = 5 * Votos5 + 4 * Votos4 + 3 * Votos3 + 2 * Votos2 + 1 * Votos1 + 0 * Votos0;
+        let TotalVotos = Votos5 + Votos4 + Votos3 + Votos2 + Votos1 + Votos0;
+        let PuntuaciónPost = SumaPuntuacion / TotalVotos;
+        Resultado.Puntuación = PuntuaciónPost.toFixed (2);
+        Resultado.NumeroVotos = TotalVotos;
+    }
+    return Resultado;
 }

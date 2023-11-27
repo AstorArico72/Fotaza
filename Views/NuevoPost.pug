@@ -36,8 +36,8 @@ html(lang="es")
                             a.nav-link(href="/Documentos/Términos-de-uso-y-Licencias.html")
                                 h5 Términos y copyright
                         li.nav-item
-                            a.nav-link(href="/Documentos/Guía-de-HTML-y-formato.html")
-                                h5 Guía de HTML y formato
+                            a.nav-link(href="/Documentos/Guía-de-Markdown-y-formato.html")
+                                h5 Guía de Markdown y formato
         h1 Nueva subida
         h2 Por #{UsuarioConectado}
         br
@@ -47,7 +47,7 @@ html(lang="es")
                 input(type="hidden", name="SubidoPor", value=`${IdUsuarioConectado}`)
                 label(for="CampoEtiquetas") Las etiquetas se separan con una coma seguida de un espacio, por ejemplo: "tag1, tag2, tag3"
                 input.input-group-text.form-control.fw-bold.input-group-lg#CampoEtiquetas(type="text", name="TagsPost", placeholder="Etiquetas (Máximo 3)")
-                label(for="ContenidoPost") Consulta la guía de HTML para darle formato al texto.
+                label(for="ContenidoPost") Consulta la Guía de Markdown para darle formato al texto.
                 textarea.form-control#ContenidoPost(name="TextoPost", cols="50", rows="10", placeholder="Texto del post")
                 label(for="Foto") Foto &#40;Máximo&nbsp;
                     abbr(title="Megabytes binarios, también llamados mebibytes. 10 MiB = 10,485,760 B.") 10 MiB

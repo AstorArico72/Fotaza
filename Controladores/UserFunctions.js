@@ -3,7 +3,32 @@ const JWT = require ("jsonwebtoken");
 const {Usuarios, Sequelize} = require ("../models");
 const Pug = require ("pug");
 const Path = require ("path");
+const Marked = require ("marked");
+const SanitizeHTML = require ("sanitize-html");
 var OtrasFunciones = require ("./OtrasFunciones.js");
+const OpcionesSanitizado = {
+    allowedTags: [
+        "h1", "h2", "h3", "h4",
+        "h5", "h6", "blockquote", "dd", "div",
+        "dl", "dt", "hr", "li", "ol", "p", "pre",
+        "ul", "a", "abbr", "b", "br", "code",
+        "em", "i", "span", "strong", "table", "tbody", "td", "tfoot", "th", "thead", "tr", "img", "b", "strong",
+        "video", "audio", "style"
+      ],
+    nonBooleanAttributes: [
+        "class", "colspan", "rowspan", "cols", "rows", "alt", "type", "height", "width", "iframe", "src", "href", "title", "media"
+    ],
+    allowedSchemes: [ 'http', 'https', 'mailto', 'tel' ],
+    allowedAttributes: {
+        a: ["href", "title", "target"],
+        img: [ 'src', 'alt', 'title', 'width', 'height'],
+        iframe: ["src", "width", "height"],
+        video: [ 'src', 'alt', 'title', 'width', 'height', "autoplay", "muted"],
+        audio: [ 'src', 'alt', 'title', 'width', 'height', "autoplay", "muted"],
+    },
+    parseStyleAttributes: true,
+    disallowedTagsMode: 'discard'
+};
 
 exports.Autenticador = async (req, res, next) => {
     let TokenAcceso = req.cookies ["AccesoFotaza"];
@@ -37,9 +62,6 @@ exports.LogOut = (async (req, res, next)=> {
 });
 
 exports.Ingresar = (async (req, res, next) => {
-    let OnlineUserId;
-    let OnlineUser;
-
     if (typeof req.user !== "undefined") {
         OnlineUser = req.user ["Usuario"];
         OnlineUserId = req.user ["ID_Usuario"];
@@ -150,7 +172,8 @@ exports.PerfilUsuario = (async (req, res, next) => {
         let NombreUsuario = FoundUser [0].Nombre_Usuario;
         let IdUsuarioEncontrado = FoundUser [0].ID;
         let FechaCreación = FoundUser [0].createdAt;
-        let DescripciónUsuario = FoundUser [0].Perfil_Usuario;
+        let MarkdownSucio = Marked.parse (FoundUser [0].Perfil_Usuario);
+        let DescripciónUsuario = SanitizeHTML (MarkdownSucio, OpcionesSanitizado);
         let RolUsuario = FoundUser [0].Rol;
 
         Perfil = Pug.renderFile ("./Views/PerfilUsuario.pug", {

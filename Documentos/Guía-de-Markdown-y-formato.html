@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Guía de Markdown y formato - Fotaza</title>
+    <link rel="stylesheet" href="/CSS" type="Text/CSS"/>
+    <link rel="icon" type="image/x-icon" href="/favicon"/>
+</head>
+<body>
+    <div class="card card-header bg-info">
+    <h1> Guía de Markdown y formato </h1>
+    </div>
+    <div class="card card-body bg-info">
+    <h2>Ésto funciona para subidas, comentarios, y perfiles de usuario.</h2>
+    <p>
+    En Fotaza, es necesario Markdown para que el texto se vea bien, y no esté todo junto. También es admisible el marcado HTML. <br>
+    El intérprete Markdown que usamos <a href="https://github.com/markedjs/marked">(Marked)</a> sigue las especificaciones <a href="https://github.github.com/gfm/">GitHub Flavored Markdown (GFM) 0.29</a>, y <a href="https://spec.commonmark.org/0.30/">CommonMark 0.30</a>, ambas licenciadas bajo CC-BY-SA, al igual que el Markdown original de Gruber.
+    </p>
+    </div>
+    <div class="card card-body">
+    <ul>
+        <li>
+            <h3>Saltos de línea</h3>
+            <p>
+                Termina la línea con dos espacios antes de presionar "Enter".
+            </p>
+        </li>
+        <li>
+            <h3>Línea separadora</h3>
+            <p>
+                Escribe tres guiones (---) al comenzar la línea, pero no escribas nada más en ésa línea.
+            </p>
+        </li>
+        <li>
+            <h3>Encabezados</h3>
+        <p>Comienza una línea con uno o más "hash" (#), así:
+            <pre>
+                <code>
+# Encabezado H1
+## Encabezado H2
+...
+###### Encabezado H6
+                </code>
+            </pre>
+        </p>
+        </li>
+        <li>
+            <h3>Negrita e itálica</h3>
+            <p>
+                Encierra tu texto entre dos asteriscos (*) para el <b>texto en negrita</b>. Encierralo entre un * para el <em>texto en itálica</em>.
+                <pre>
+                    <code>
+*Itálica*
+**Negrita**
+***Negrita mas itálica***
+                    </code>
+                </pre>
+            </p>
+        </li>
+        <li>
+            <h3>Listas</h3>
+            <p>
+                Pon un guión (-) o un signo más (+) - pero no los mezcles - delante de cada ítem para listas desordenadas. Usa números o letras seguidas de un punto para listas ordenadas. La lista es creada automáticamente. No olvides poner un espacio entre los símbolos y los ítems.
+                <pre>
+                    <code>
+Lista desordenada
+- Item 1
+- Item 2
+- Item 3
+
+Lista ordenada
+1. Item
+2. Item
+3. Item
+
+I. Item
+II. Item
+III. Item
+Ten en cuenta que la lista se ordena sola según qué ítem está primero.
+                    </code>
+                </pre>
+            </p>
+        </li>
+        <li>
+            <h3>Enlaces externos</h3>
+            <p>
+                Encierra la dirección del enlace entre flechas (&lt;&gt;) para un enlace automático. Para enlaces con texto, coloca el texto entre corchetes, seguido de la dirección entre paréntesis. También puedes guardar los enlaces en variables al comienzo del texto y usarlos después, así:
+                <pre>
+                    <code>
+Autoenlace
+&lt;http://www.example.com&gt;
+
+Enlace dentro de un párrafo
+Lorem ipsum dolor sit amet consectetur adipisicing elit.  
+[Enlace 1](http://www.example.net "Título opcional del enlace aquí") Temporibus eum laboriosam, enim aut reprehenderit magnam necessitatibus! Repellendus ad eaque, in
+
+Éso se transforma en:
+&lt;p&gt;
+Lorem ipsum dolor sit amet consectetur adipisicing elit.&lt;br&gt;
+&lt;a href="http://www.example.net" title="Título opcional del enlace aquí"&gt;Enlace 1&lt;/a&gt;Temporibus eum laboriosam, enim aut reprehenderit magnam necessitatibus! Repellendus ad eaque, in
+&lt;/p&gt;
+
+Enlace guardado en referencia, que puede reusarse dentro del texto
+[Enlace 2]: http://www.example.org "Título opcional del enlace aquí"
+
+Usando el enlace guardado
+Lorem ipsum dolor sit amet consectetur adipisicing elit. Temporibus eum laboriosam, enim aut reprehenderit magnam necessitatibus! [Enlace 2]
+
+Éso se transforma en:
+&lt;p&gt;
+Lorem ipsum dolor sit amet consectetur adipisicing elit. Temporibus eum laboriosam, enim aut reprehenderit magnam necessitatibus! &lt;a href="http://www.example.org" title="Título opcional del enlace aquí"&gt; Enlace 2 &lt;/a&gt;
+&lt;/p&gt;
+
+                    </code>
+                </pre>
+            </p>
+        </li>
+        <li>
+            <h3>Imágenes externas</h3>
+            <p>
+                Igual que la sección de enlaces (pero excluyendo los autoenlaces). Sólo añade un signo de exclamación delante de los corchetes.
+                <pre>
+                    <code>
+Imágen simple
+![Texto alt de la imágen](http://www.example.net/image.png "Título opcional")
+Éso se transforma en:
+&lt;img src="http://www.example.net/image.png" alt="Texto alt de la imágen" title="Título opcional"&gt;
+
+Imágen sin texto alt
+![](http://www.example.net/image.png)
+
+Éso se transforma en:
+&lt;img src="http://www.example.net/image.png"&gt;
+
+Imágen guardada como referencia
+[Imágen 1]: http://www.example.net/image.png "Título opcional"
+
+Usando la imágen guardada
+Lorem ipsum dolor sit amet consectetur adipisicing elit. Temporibus eum laboriosam, enim aut reprehenderit magnam necessitatibus ![Imágen 1]
+Nótese cómo no hay un "!" al guardar la referencia, pero sí hay un "!" al llamar a la referencia.
+                    </code>
+                </pre>
+            </p>
+        </li>
+        <li>
+            <h3>Tablas</h3>
+            <p>
+                Encierra el texto de las columnas entre "tubos" ("|"), pero tiene que haber un espacio entre el "tubo" y el texto, así: | foobar |
+                <pre>
+                    <code>
+Nota: La primera fila siempre es interpretada como &lt;th&gt; en lugar de &lt;td&gt;
+| Columna 1 | Columna 2 |
+| --- | --- |
+| foobar | bazbim |
+| lunes | martes |
+La segunda fila separa el encabezado del cuerpo de la tabla.
+Las etiquetas &lt;table&gt;, &lt;thead&gt;, y &lt;tbody&gt; se crean automáticamente.
+                    </code>
+                </pre>
+            </p>
+        </li>
+        <li>
+            <h3>Código y texto de ancho fijo</h3>
+            <p>
+                Encierra el texto entre tres acentos graves (```) o tres tildes (~~~), ni más ni menos, para un bloque de código. Encierra el texto entre un par de acentos para una sección de código.
+                <pre>
+                    <code>
+~~~
+Bloque de código encerrado entre tildes.
+No es necesario terminar la línea con doble espacio para un salto de línea en los bloques de código.
+~~~
+
+```
+Bloque de código encerrado entre acentos.
+```
+
+Foo `Código indentado en un párrafo` bar
+Puede haber un espacio separando el acento del código.
+`` Código que contiene un acento ` como ése debe abrirse y cerrarse con dos acentos ``
+                    </code>
+                </pre>
+            </p>
+        </li>
+        <li>
+            <h3><del>Texto tachado</del></h3>
+            <p>
+                Encierra el texto entre una o dos tildes (~).
+                <pre>
+                    <code>
+~~Fotaza es basura~~
+~Muere~
+                    </code>
+                </pre>
+            </p>
+        </li>
+        <li>
+            <h3>Videos y audio externos, iframes, y estilo.</h3>
+            <p>
+                Éso no está cubierto por la sintaxis Markdown, pero puedes insertar las etiquetas HTML correspondientes también. Revisa alguna guía de HTML.
+            </p>
+            <div class="card card-body bg-danger">
+                <p>
+                    <b>
+                    Etiquetas prohibidas por motivos de seguridad: &lt;script&gt;, &lt;form&gt; y todo tipo de &lt;input&gt;. <br>
+                    Etiquetas no permitidas por interferir con la disposición: &lt;footer&gt;, &lt;aside&gt;.
+                    </b>
+                </p>
+            </div>
+        </li>
+    </ul>
+    </div>
+</body>
+</html>
