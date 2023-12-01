@@ -32,6 +32,11 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true,
       defaultValue: null
     },
+    URL_Miniatura: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      defaultValue: null
+    },
     Etiquetas_Post: {
       type: DataTypes.STRING,
       allowNull: true,

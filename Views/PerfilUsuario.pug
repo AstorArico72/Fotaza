@@ -8,39 +8,7 @@ html(lang="es")
         title #{UserName} - Fotaza
         link(rel="icon", href="/favicon", type="image/x-icon")
     body
-        nav.navbar.navbar-expand-lg.navbar-nav.navbar-toggleable-sm.navbar-light.bg-light.border-bottom.box-shadow.mb-3.sticky-top
-            div.container-fluid
-                div.navbar-collapse.collapse.d-sm-inline-flex.justify-content-between
-                    ul.navbar-nav.flex-grow-1.align-items-center
-                        li.nav-item
-                            h2
-                                a.nav-link.text-dark(href="/Posts") Fotaza
-                        - if (IdUsuarioConectado == "NULL")
-                            li.nav-item
-                                button.btn.btn-primary
-                                    a.nav-link.text-light(href="/Usuario/Ingresar") Iniciar Sesión
-                        - else
-                            li.nav-item
-                                a.nav-link.text-success(href=`/Usuario/Perfil/${IdUsuarioConectado}`)
-                                    h4 #{UsuarioConectado}
-                            li.nav-item
-                                a.nav-link.text-danger(href="/Usuario/Salir")
-                                    h5 Salir
-                            li.nav-item
-                                a.nav-link.text-info(href="/Posts/Subir")
-                                    h5 Subir Post
-                            li.nav-item
-                                a.nav-link.text-warning(href="/Usuario/EditarPerfil")
-                                    h5 Editar Perfil
-                        li.nav-item
-                            a.nav-link(href="/Posts/Destacados")
-                                h5 Destacados
-                        li.nav-item
-                            a.nav-link(href="/Documentos/Términos-de-uso-y-Licencias.html")
-                                h5 Términos y copyright
-                        li.nav-item
-                            a.nav-link(href="/Documentos/Guía-de-Markdown-y-formato.html")
-                                h5 Guía de Markdown y formato
+        include Navbar.pug
         div.card.card-header
             h1 #{UserName}
         div.card.card-body

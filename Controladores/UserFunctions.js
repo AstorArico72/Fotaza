@@ -6,6 +6,7 @@ const Path = require ("path");
 const Marked = require ("marked");
 const SanitizeHTML = require ("sanitize-html");
 var OtrasFunciones = require ("./OtrasFunciones.js");
+
 const OpcionesSanitizado = {
     allowedTags: [
         "h1", "h2", "h3", "h4",
@@ -63,8 +64,6 @@ exports.LogOut = (async (req, res, next)=> {
 
 exports.Ingresar = (async (req, res, next) => {
     if (typeof req.user !== "undefined") {
-        OnlineUser = req.user ["Usuario"];
-        OnlineUserId = req.user ["ID_Usuario"];
         return res.redirect (301, "/");
     } else {
         res.sendFile ("Login.html", {root: Path.join (__dirname, "../Publico")});
@@ -142,16 +141,8 @@ exports.NewUser = (async (req, res, next) => {
 
 exports.PerfilUsuario = (async (req, res, next) => {
     let Perfil;
-    let OnlineUser;
-    let OnlineUserId;
-
-    if (typeof req.user !== "undefined") {
-        OnlineUser = req.user ["Usuario"];
-        OnlineUserId = req.user ["ID_Usuario"];
-    } else {
-        OnlineUser = "NIL";
-        OnlineUserId = "NULL";
-    }
+    let OnlineUser = OtrasFunciones.HayUsuario (req).NombreUsuario;
+    let OnlineUserId = OtrasFunciones.HayUsuario (req).IdUsuario;
 
     let FoundUser = await Usuarios.findAll ({
         attributes: [
@@ -190,17 +181,9 @@ exports.PerfilUsuario = (async (req, res, next) => {
 });
 
 exports.EditUser = (async (req, res, next) => {
-    let OnlineUser;
-    let OnlineUserId;
     let Página;
-
-    if (typeof req.user !== "undefined") {
-        OnlineUser = req.user ["Usuario"];
-        OnlineUserId = req.user ["ID_Usuario"];
-    } else {
-        OnlineUser = "NIL";
-        OnlineUserId = "NULL";
-    }
+    let OnlineUser = OtrasFunciones.HayUsuario (req).NombreUsuario;
+    let OnlineUserId = OtrasFunciones.HayUsuario (req).IdUsuario;
 
     let FoundUser = await Usuarios.findAll ({
         attributes: [
@@ -215,7 +198,7 @@ exports.EditUser = (async (req, res, next) => {
         }
     });
 
-    if (OnlineUserId == "NULL") {
+    if (OnlineUserId == null) {
         OtrasFunciones.PaginaErrorPug (res, 401, "Función no permitida.");
     } else {
         let NombreUsuario = FoundUser [0].Nombre_Usuario;
@@ -231,16 +214,10 @@ exports.EditUser = (async (req, res, next) => {
 });
 
 exports.SubirCambios = (async (req, res, next) => {
-    let OnlineUserId;
+    let OnlineUserId = OtrasFunciones.HayUsuario (req).IdUsuario;
     let IdUsuario = req.body.IdUsuario;
 
-    if (typeof req.user !== "undefined") {
-        OnlineUserId = req.user ["ID_Usuario"];
-    } else {
-        OnlineUserId = "NULL";
-    }
-
-    if (OnlineUserId == "NULL" || OnlineUserId != IdUsuario) {
+    if (OnlineUserId == null || OnlineUserId != IdUsuario) {
         OtrasFunciones.PaginaErrorPug (res, 403, "Función no permitida.");
     }
 
@@ -282,8 +259,8 @@ exports.SubirCambios = (async (req, res, next) => {
 });
 
 exports.CambiarClave = (async (req, res, next) => {
-    let OnlineUser;
-    let OnlineUserId;
+    let OnlineUser = OtrasFunciones.HayUsuario (req).NombreUsuario;
+    let OnlineUserId = OtrasFunciones.HayUsuario (req).IdUsuario;
     let IdUsuario = req.body.IdUsuario;
     let UserPassword = req.body.ContraseñaUsuario;
 
@@ -291,15 +268,7 @@ exports.CambiarClave = (async (req, res, next) => {
     const salt = await BCrypt.genSalt(10);
     const NewPassword = await BCrypt.hash(UserPassword, salt);
 
-    if (typeof req.user !== "undefined") {
-        OnlineUser = req.user ["Usuario"];
-        OnlineUserId = req.user ["ID_Usuario"];
-    } else {
-        OnlineUser = "NIL";
-        OnlineUserId = "NULL";
-    }
-
-    if (OnlineUserId == "NULL" || OnlineUserId != IdUsuario) {
+    if (OnlineUserId == null || OnlineUserId != IdUsuario) {
         OtrasFunciones.PaginaErrorPug (res, 403, "Función no permitida.");
     } else {
         try {
@@ -317,14 +286,8 @@ exports.CambiarClave = (async (req, res, next) => {
 });
 
 exports.EditPassword = (async (req, res, next) => {
-    let OnlineUserId;
+    let OnlineUserId = OtrasFunciones.HayUsuario (req).IdUsuario;
     let Página;
-
-    if (typeof req.user !== "undefined") {
-        OnlineUserId = req.user ["ID_Usuario"];
-    } else {
-        OnlineUserId = "NULL";
-    }
 
     let FoundUser = await Usuarios.findAll ({
         attributes: [
@@ -336,7 +299,7 @@ exports.EditPassword = (async (req, res, next) => {
         }
     });
 
-    if (OnlineUserId == "NULL") {
+    if (OnlineUserId == null) {
         OtrasFunciones.PaginaErrorPug (res, 403, "Función no permitida.");
     } else {
         let NombreUsuario = FoundUser [0].Nombre_Usuario;

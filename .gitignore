@@ -132,3 +132,10 @@ dist
 *.jpeg
 *.jpg
 *.png
+*.JPEG
+*.JPG
+*.PNG
+*.bmp
+*.BMP
+*.gif
+*.GIF

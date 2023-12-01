@@ -6,6 +6,9 @@ const FS = require ("fs");
 const {formidable, errors} = require ("formidable");
 const Marked = require ("marked");
 const SanitizeHTML = require ("sanitize-html");
+const TiposMIME = require ("mime-types");
+const ImageThumbnail = require ("image-thumbnail");
+
 const FormatoFecha = {
     hour12: true,
     day: "numeric",
@@ -22,10 +25,10 @@ const OpcionesSanitizado = {
         "dl", "dt", "hr", "li", "ol", "p", "pre",
         "ul", "a", "abbr", "b", "br", "code",
         "em", "i", "span", "strong", "table", "tbody", "td", "tfoot", "th", "thead", "tr", "img", "b", "strong",
-        "video", "audio", "style"
+        "video", "audio"
       ],
     nonBooleanAttributes: [
-        "class", "colspan", "rowspan", "cols", "rows", "alt", "type", "height", "width", "iframe", "src", "href", "title", "media"
+        "class", "colspan", "rowspan", "cols", "rows", "alt", "type", "height", "width", "iframe", "src", "href", "title", "media", "style"
     ],
     allowedSchemes: [ 'http', 'https', 'mailto', 'tel' ],
     allowedAttributes: {
@@ -45,22 +48,15 @@ exports.VerSubida = async (req, res, _next) => {
     let NumeroSubida = req.params.ID;
     let PostSeleccionado;
     let AutoVoto = false;
-    let OnlineUser;
-    let OnlineUserId;
-    let UserRole;
+    let OnlineUser = OtrasFunciones.HayUsuario (req).NombreUsuario;
+    let OnlineUserId = OtrasFunciones.HayUsuario (req).IdUsuario;
+    let UserRole = OtrasFunciones.HayUsuario (req).RolUsuario;
     let PermitirVoto;
     let VotoDelUsuario = null;
+    let TipoImagen = null;
+    let TamañoImagen = null;
 
-    if (typeof req.user !== "undefined") {
-        OnlineUser = req.user ["Usuario"];
-        OnlineUserId = req.user ["ID_Usuario"];
-        UserRole = req.user ["Rol_Usuario"];
-    } else {
-        OnlineUser = "NIL";
-        OnlineUserId = "NULL";
-    }
-
-    if (OnlineUserId != "NULL" || OnlineUserId !== undefined) {
+    if (OnlineUserId != null) {
         VotoDelUsuario = await VotosUsuarios.findAll ({
             where: {
                 Usuario: OnlineUserId,
@@ -88,7 +84,7 @@ exports.VerSubida = async (req, res, _next) => {
 
     let ConjuntoResultados = CalcularPuntuación (NumeroSubida);
 
-    if (OnlineUser == "NIL") {
+    if (OnlineUser == null) {
         PostSeleccionado = await Posts.findAll ({
             where: {
                 ID: NumeroSubida,
@@ -111,6 +107,19 @@ exports.VerSubida = async (req, res, _next) => {
         let Foto;
         if (PostSeleccionado [0].URL_Medios != null || PostSeleccionado [0].URL_Medios != undefined) {
             Foto = PostSeleccionado [0].URL_Medios;
+            TipoImagen = TiposMIME.lookup (Foto);
+            TamañoImagen = FS.statSync (Path.join (__dirname, "../" + Foto)).size;
+            if (TamañoImagen >= 1048576) {
+                TamañoImagen = (TamañoImagen / 1048576).toFixed (2) + " MiB";
+            } else if (TamañoImagen >= 102400) {
+                TamañoImagen = (TamañoImagen / 1024).toFixed (0) + " KiB";
+            } else if (TamañoImagen >= 10240) {
+                TamañoImagen = (TamañoImagen / 1024).toFixed (1) + " KiB";
+            } else if (TamañoImagen >= 1024) {
+                TamañoImagen = (TamañoImagen / 1024).toFixed (2) + " KiB";
+            } else {
+                TamañoImagen = TamañoImagen.toFixed (0) + " B";
+            }
         } else {
             Foto = "/Medios/null";
         }
@@ -230,7 +239,9 @@ exports.VerSubida = async (req, res, _next) => {
             PuntuaciónPost: (await ConjuntoResultados).Puntuación,
             VotosPost: (await ConjuntoResultados).NumeroVotos,
             PermitirVoto: PermitirVoto,
-            AutoVoto: AutoVoto
+            AutoVoto: AutoVoto,
+            MimeImagen: TipoImagen,
+            FileSize: TamañoImagen
         });
         res.send (FullPost);
     } else {
@@ -240,16 +251,8 @@ exports.VerSubida = async (req, res, _next) => {
 }
 
 exports.TodosLosPosts = async (req, res) => {
-    let OnlineUser;
-    let OnlineUserId;
-
-    if (typeof req.user !== "undefined") {
-        OnlineUser = req.user ["Usuario"];
-        OnlineUserId = req.user ["ID_Usuario"];
-    } else {
-        OnlineUser = "NIL";
-        OnlineUserId = "NULL";
-    }
+    let OnlineUser = OtrasFunciones.HayUsuario (req).NombreUsuario;
+    let OnlineUserId = OtrasFunciones.HayUsuario (req).IdUsuario;
 
     let ListadoCategorías = require ("../Publico/Categorías.json");
     let ListaSubidas = await Posts.findAll ({
@@ -261,7 +264,7 @@ exports.TodosLosPosts = async (req, res) => {
             "Etiquetas_Post",
             "Categoría_Post",
             "Visibilidad",
-            "URL_Medios"
+            "URL_Miniatura"
         ],
         order: [
             ["createdAt", "DESC"]
@@ -294,15 +297,15 @@ exports.TodosLosPosts = async (req, res) => {
                 ColorPost = ListadoCategorías.Colores [CategoríaPost];
                 break;
         }
-        if (ListaSubidas [i].URL_Medios == undefined || ListaSubidas [i].URL_Medios == null) {
-            ListaSubidas [i].URL_Medios = "/Medios/null";
+        if (ListaSubidas [i].URL_Miniatura == undefined || ListaSubidas [i].URL_Miniatura == null) {
+            ListaSubidas [i].URL_Miniatura = "/Medios/null";
         }
         ListaSubidas [i].Numero_OP= Numero_OP;
         ListaSubidas [i].Nombre_OP= Nombre_OP;
         ListaSubidas [i].Color_Fondo= ColorPost;
         ListaSubidas [i].FechaSubida= ListaSubidas [i].createdAt.toLocaleDateString ("es-US", FormatoFecha);
 
-        if (OnlineUser == "NIL" || OnlineUser == undefined) {
+        if (OnlineUser == null || OnlineUser == undefined) {
             if (ListaSubidas [i].Visibilidad == "Público") {
                 ListaPosts.push (ListaSubidas [i]);
             }
@@ -333,7 +336,7 @@ exports.BorrarPost = async (req, res) => {
 
 exports.BuscarPosts = async (req, res) => {
     let ListadoCategorías = require ("../Publico/Categorías.json");
-    let SequelizeQuery = "SELECT `Título_Post`, `createdAt`, `Usuario`, `ID`, `Etiquetas_Post`, `Categoría_Post`, `Licencia_Foto`, `URL_Medios` FROM `Posts` AS `Posts` WHERE ";
+    let SequelizeQuery = "SELECT `Título_Post`, `createdAt`, `Usuario`, `ID`, `Etiquetas_Post`, `Categoría_Post`, `Licencia_Foto`, `URL_Miniatura` FROM `Posts` AS `Posts` WHERE ";
     let Usuario = "Todos";
     switch (req.query.Tag) {
         case "null" || undefined:
@@ -409,8 +412,8 @@ exports.BuscarPosts = async (req, res) => {
                 ColorPost = ListadoCategorías.Colores [CategoríaPost];
                 break;
         }
-        if (ListaSubidas [i].URL_Medios == undefined || ListaSubidas [i].URL_Medios == null) {
-            ListaSubidas [i].URL_Medios = "/Medios/null";
+        if (ListaSubidas [i].URL_Miniatura == undefined || ListaSubidas [i].URL_Miniatura == null) {
+            ListaSubidas [i].URL_Miniatura = "/Medios/null";
         }
         ListaSubidas [i].Numero_OP= Numero_OP;
         ListaSubidas [i].Nombre_OP= Nombre_OP;
@@ -419,16 +422,8 @@ exports.BuscarPosts = async (req, res) => {
         ListaPosts.push (ListaSubidas [i]);
     }
 
-    let OnlineUser;
-    let OnlineUserId;
-
-    if (typeof req.user !== "undefined") {
-        OnlineUser = req.user ["Usuario"];
-        OnlineUserId = req.user ["ID_Usuario"];
-    } else {
-        OnlineUser = "NIL";
-        OnlineUserId = "NULL";
-    }
+    let OnlineUser = OtrasFunciones.HayUsuario (req).NombreUsuario;
+    let OnlineUserId = OtrasFunciones.HayUsuario (req).IdUsuario;
 
     let Listado = Pug.renderFile ("./Views/AllPosts.pug", {
         UploadList: ListaPosts,
@@ -450,6 +445,10 @@ exports.NuevoPost = async (req, res) => {
     let Categoría;
     let Visibilidad_Post;
     var CancelarSubida = false;
+    var Foto = null;
+    var NombreTruncado;
+    var NombreArchivoMiniatura = null;
+
     const OpcionesFormulario = {
         keepExtensions: true,
         allowEmptyFiles: false,
@@ -469,12 +468,19 @@ exports.NuevoPost = async (req, res) => {
     var DatosSubidos = formidable (OpcionesFormulario);
 
     var UrlMedios = null;
+    var UrlMiniatura = null;
     var CamposFormulario = {
         TituloPost: "",
         SubidoPor: null,
         TextoPost: "",
         EtiquetasPost: ""
     };
+    var OpcionesMiniatura = {
+        width: 128,
+        height: 128,
+        fit: "fill",
+        responseType: "buffer"
+    }
     let SeparadorComa = new RegExp (/\,\s/, "g");
     let SubirDatos = new Promise ((resolve, reject) => {
         DatosSubidos.parse (req, (error, fields, files)=> {
@@ -506,12 +512,14 @@ exports.NuevoPost = async (req, res) => {
             }
 
             if (files.PostMedia !== undefined) {
-                let Foto = files.PostMedia [0];
-                let NombreTruncado = encodeURIComponent(Foto.originalFilename.replace(/\s/g, "-"));
+                Foto = files.PostMedia [0];
+                NombreTruncado = encodeURIComponent(Foto.originalFilename.replace(/\s/g, "-"));
                 let Ahora = new Date ();
                 let NombreArchivo = Ahora.getFullYear () + "-" + (Ahora.getMonth () +1)+ "-" + Ahora.getDate ()+ "-" + Ahora.getHours () + "-" + Ahora.getMinutes () + "-" + Ahora.getSeconds () + "-" + NombreTruncado;
+                NombreArchivoMiniatura = "Thumb-" + NombreArchivo;
                 FS.renameSync (Foto.filepath, Path.join (DirectorioSubida, NombreArchivo));
                 UrlMedios = "/Medios/" + NombreArchivo;
+                UrlMiniatura = "/Medios/" + NombreArchivoMiniatura;
             }
             
             if (typeof (fields.TagsPost [0]) != "undefined") {
@@ -526,7 +534,7 @@ exports.NuevoPost = async (req, res) => {
                 CamposFormulario ["EtiquetasPost"] = null;
             }
             if (!error) {
-                resolve (CamposFormulario);
+                resolve ({CamposFormulario, Foto, NombreArchivoMiniatura});
             } else {
                 console.log ("Subida cancelada: " + error);
                 return OtrasFunciones.PaginaErrorPug (res, error.httpCode, error);
@@ -534,18 +542,28 @@ exports.NuevoPost = async (req, res) => {
         });
     });
     try {
-        SubirDatos.then ((data)=> {
+        SubirDatos.then (async (data)=> {
             console.log (data);
             Posts.create ({
-                Título_Post: data ["TituloPost"],
-                Usuario: data ["SubidoPor"],
-                Texto_Post: data ["TextoPost"],
+                Título_Post: data.CamposFormulario ["TituloPost"],
+                Usuario: data.CamposFormulario ["SubidoPor"],
+                Texto_Post: data.CamposFormulario ["TextoPost"],
                 URL_Medios: UrlMedios,
-                Etiquetas_Post: data ["EtiquetasPost"],
+                URL_Miniatura: UrlMiniatura,
+                Etiquetas_Post: data.CamposFormulario ["EtiquetasPost"],
                 Licencia_Foto: Licencia,
                 Categoría_Post: Categoría,
                 Visibilidad: Visibilidad_Post
             });
+            if (UrlMedios != null) {
+                let BufferFoto = FS.readFileSync (Path.join (DirectorioSubida, "../", UrlMedios));
+                let Miniatura = await ImageThumbnail (BufferFoto, OpcionesMiniatura);
+                FS.writeFile (Path.join (DirectorioSubida, data.NombreArchivoMiniatura), Miniatura, (error)=> {
+                    if (error) {
+                        OtrasFunciones.PaginaErrorPug (res, error.httpCode || 500, error);
+                    }
+                });
+            }
         }).then (()=> {
             OtrasFunciones.PaginaErrorPug (res, 201, "Post subido.");
         })
@@ -555,7 +573,7 @@ exports.NuevoPost = async (req, res) => {
 }
 
 exports.VotarPost = (async (req, res, next) => {
-    let OnlineUserId = req.user ["ID_Usuario"];
+    let OnlineUserId = OtrasFunciones.HayUsuario (req).IdUsuario;
     let PostId = req.body.PostId;
     let OP = await Posts.findAll ({
         attributes: ["ID", "Usuario"],
@@ -631,16 +649,8 @@ exports.VotarPost = (async (req, res, next) => {
 });
 
 exports.PostsDestacados = async (req, res) => {
-    let OnlineUser;
-    let OnlineUserId;
-
-    if (typeof req.user !== "undefined") {
-        OnlineUser = req.user ["Usuario"];
-        OnlineUserId = req.user ["ID_Usuario"];
-    } else {
-        OnlineUser = "NIL";
-        OnlineUserId = "NULL";
-    }
+    let OnlineUser = OtrasFunciones.HayUsuario (req).NombreUsuario;
+    let OnlineUserId = OtrasFunciones.HayUsuario (req).IdUsuario;
 
     let ListadoCategorías = require ("../Publico/Categorías.json");
     let ListaSubidas = await Posts.findAll ({
@@ -652,7 +662,7 @@ exports.PostsDestacados = async (req, res) => {
             "Etiquetas_Post",
             "Categoría_Post",
             "Visibilidad",
-            "URL_Medios"
+            "URL_Miniatura"
         ],
         order: [
             ["createdAt", "DESC"]
@@ -691,8 +701,8 @@ exports.PostsDestacados = async (req, res) => {
                 ColorPost = ListadoCategorías.Colores [CategoríaPost];
                 break;
         }
-        if (ListaSubidas [i].URL_Medios == undefined || ListaSubidas [i].URL_Medios == null) {
-            ListaSubidas [i].URL_Medios = "/Medios/null";
+        if (ListaSubidas [i].URL_Miniatura == undefined || ListaSubidas [i].URL_Miniatura == null) {
+            ListaSubidas [i].URL_Miniatura = "/Medios/null";
         }
         ListaSubidas [i].Numero_OP= Numero_OP;
         ListaSubidas [i].Nombre_OP= Nombre_OP;
@@ -702,7 +712,7 @@ exports.PostsDestacados = async (req, res) => {
         if ((await Puntuación).NumeroVotos != null) {
             ListaSubidas [i].PuntuaciónPost = (await Puntuación).Puntuación;
             ListaSubidas [i].TotalVotos = (await Puntuación).NumeroVotos;
-            if (OnlineUser == "NIL" || OnlineUser == undefined) {
+            if (OnlineUser == null || OnlineUser == undefined) {
                 if (ListaSubidas [i].Visibilidad == "Público") {
                     if (ListaSubidas [i].PuntuaciónPost >= 4 && ListaSubidas [i].TotalVotos >= 50) {
                         ListaPosts.push (ListaSubidas [i]);

@@ -26,17 +26,9 @@ function CargarPaginaPugSegura (req, res, ArchivoPug) {
 }
 
 function CargarPaginaPugBasica (req, res, ArchivoPug) {
-    let OnlineUser;
-    let OnlineUserId;
+    let OnlineUser = OtrasFunciones.HayUsuario (req).NombreUsuario;
+    let OnlineUserId = OtrasFunciones.HayUsuario (req).IdUsuario;
     let Pagina;
-
-    if (typeof req.user !== "undefined") {
-        OnlineUser = req.user ["Usuario"];
-        OnlineUserId = req.user ["ID_Usuario"];
-    } else {
-        OnlineUser = "NIL";
-        OnlineUserId = "NULL";
-    }
 
     try {
         Pagina = Pug.renderFile (ArchivoPug, {
@@ -60,7 +52,21 @@ function PaginaErrorPug (res, EstadoHTTP, Excepción) {
     res.status (EstadoHTTP).send (Pagina);
 }
 
+function HayUsuario (req) {
+    let UsuarioConectado = {
+        IdUsuario: null,
+        NombreUsuario: null,
+        RolUsuario: null
+    };
+    if (typeof req.user !== "undefined") {
+        UsuarioConectado.NombreUsuario = req.user ["Usuario"];
+        UsuarioConectado.IdUsuario = req.user ["ID_Usuario"];
+        UsuarioConectado.RolUsuario = req.user ["Rol_Usuario"];
+    }
+    return UsuarioConectado
+}
+
 exports.PaginaErrorPug = PaginaErrorPug;
 exports.CargarPaginaPugBasica = CargarPaginaPugBasica;
 exports.CargarPaginaPugSegura = CargarPaginaPugSegura;
-//exports.CargarArchivoEstático = CargarArchivoEstático;
+exports.HayUsuario = HayUsuario;

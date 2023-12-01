@@ -1,0 +1,64 @@
+nav.navbar.navbar-expand-lg.navbar-nav.navbar-toggleable-sm.navbar-light.bg-light.border-bottom.box-shadow.mb-3.sticky-top
+    div.container-fluid
+        div.navbar-collapse.collapse.d-sm-inline-flex.justify-content-between
+            ul.navbar-nav.flex-grow-1.align-items-center
+                li.nav-item
+                    h2
+                        a.nav-link.text-dark(href="/Posts") Fotaza
+                - if (IdUsuarioConectado == null)
+                    li.nav-item
+                        button.btn.btn-primary
+                            a.nav-link.text-light(href="/Usuario/Ingresar") Iniciar Sesión
+                - else
+                    li.nav-item
+                        a.nav-link.text-success(href=`/Usuario/Perfil/${IdUsuarioConectado}`)
+                            h4 #{UsuarioConectado}
+                    li.nav-item
+                        a.nav-link.text-danger(href="/Usuario/Salir")
+                            h5 Salir
+                    li.nav-item
+                        a.nav-link.text-info(href="/Posts/Subir")
+                            h5 Subir Post
+                    li.nav-item
+                        a.nav-link.text-warning(href="/Usuario/EditarPerfil")
+                            h5 Editar Perfil
+                li.nav-item
+                    a.nav-link(href="/Posts/Destacados")
+                        h5 Destacados
+                li.nav-item
+                    a.nav-link(href="/Documentos/Términos-de-uso-y-Licencias.html")
+                        h5 Términos y copyright
+                li.nav-item
+                    a.nav-link(href="/Documentos/Guía-de-Markdown-y-formato.html")
+                        h5 Guía de Markdown y formato
+                li.nav-item
+                    form(action="/Posts/Buscar", method="get")
+                        p
+                            input(type="search", name="Tag", placeholder="Etiquetas")
+                            |Categoría:&nbsp;
+                            select(name="Categoria")
+                                option(value="Todas" selected) Cualquier categoría
+                                option(value="Paisaje") Paisajes
+                                option(value="Animales") Fauna
+                                option(value="Plantas") Flora
+                                option(value="Deportes") Deportes de cualquier tipo
+                                option(value="Salud") Salud, bienestar
+                                option(value="Stock") Foto de stock
+                                option(value="Automotor") Autos, motos, y afines
+                                option(value="Arte") Arte, dibujos, y manualidades
+                                option(value="Diversión") Diversión variada
+                                option(value="null") Sin categoría
+                            |Licencia:&nbsp;
+                            select(name="Licencia")
+                                option(value="Todas" selected) Cualquier licencia
+                                option(value="CC-BY") CC-BY
+                                option(value="CC-BY-SA") CC-BY-SA
+                                option(value="CC-BY-ND") CC-BY-ND
+                                option(value="CC-BY-NC") CC-BY-NC
+                                option(value="CC-BY-NC-ND") CC-BY-NC-ND
+                                option(value="CC-BY-NC-SA") CC-BY-NC-SA
+                                option(value="CC0") CC Zero
+                                option(value="Copyright") Copyright
+                                option(value="Public") Dominio Público
+                                option(value="null") Sin licencia
+                            button.btn.btn-success(type="submit") Buscar

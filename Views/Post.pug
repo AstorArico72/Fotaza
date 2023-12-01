@@ -9,42 +9,30 @@ html(lang="es")
         link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css", type="Text/CSS")
         title #{PostTitle} - Fotaza
         link(rel="icon", href="/favicon", type="image/x-icon")
+        script.
+            var UrlFoto = "!{UrlImagen}";
+            var Usuario = "#{OriginalPoster}";
+            window.addEventListener ("load", function () {
+                var DatosImagen = document.getElementById ("DatosImagen");
+                let Lienzo = document.getElementById ("Lienzo");
+                Lienzo.width = window.innerWidth;
+                Lienzo.height = window.innerHeight;
+                let ContextoLienzo = Lienzo.getContext ("2d");
+                let Imagen = new Image ();
+                Imagen.src = UrlFoto;
+                let Escala = Math.min(Lienzo.width / Imagen.width, Lienzo.height / Imagen.height);
+                Imagen.addEventListener ("load", function () {
+                    ContextoLienzo.drawImage (Imagen, 0, 0, Imagen.width * Escala, Imagen.height * Escala);
+                    ContextoLienzo.font = "60px sans-serif";
+                    ContextoLienzo.textBaseline = "middle";
+                    ContextoLienzo.fillStyle = "black";
+                    ContextoLienzo.textAlign = "left"
+                    ContextoLienzo.strokeText ("www.Fotaza.net - Por @" + Usuario, 40, 60);
+                    DatosImagen.innerHTML += " " + Imagen.width + "x" + Imagen.height;
+                });
+            });
     body
-        nav.navbar.navbar-expand-lg.navbar-nav.navbar-toggleable-sm.navbar-light.bg-light.border-bottom.box-shadow.mb-3.sticky-top
-            div.container-fluid
-                div.navbar-collapse.collapse.d-sm-inline-flex.justify-content-between
-                    ul.navbar-nav.flex-grow-1.align-items-center
-                        li.nav-item
-                            h2
-                                a.nav-link.text-dark(href="/Posts") Fotaza
-                        - if (IdUsuarioConectado == "NULL")
-                            li.nav-item
-                                button.btn.btn-primary
-                                    a.nav-link.text-light(href="/Usuario/Ingresar") Iniciar Sesión
-                        - else
-                            li.nav-item
-                                a.nav-link.text-success(href=`/Usuario/Perfil/${IdUsuarioConectado}`)
-                                    h4 #{UsuarioConectado}
-                            li.nav-item
-                                a.nav-link.text-danger(href="/Usuario/Salir")
-                                    h5 Salir
-                            li.nav-item
-                                a.nav-link.text-info(href="/Posts/Subir")
-                                    h5 Subir Post
-                            li.nav-item
-                                a.nav-link.text-warning(href="/Usuario/EditarPerfil")
-                                    h5 Editar Perfil
-                        li.nav-item
-                            a.nav-link(href="/Posts/Destacados")
-                                h5 Destacados
-                        li.nav-item
-                            a.nav-link(href="/Documentos/Términos-de-uso-y-Licencias.html")
-                                h5 Términos y copyright
-                        li.nav-item
-                            a.nav-link(href="/Documentos/Guía-de-Markdown-y-formato.html")
-                                h5 Guía de Markdown y formato
-        - if (TarjetaMensaje != null)
-            div.sticky-top!=TarjetaMensaje
+        include Navbar.pug
         div.card.card-header(style=`background-color: ${ColorCategoría};`)
             h1 #{PostTitle}
             h2 Subido el #{PostDate} por&nbsp;
@@ -59,14 +47,19 @@ html(lang="es")
                 a(href="/Documentos/Términos-de-uso-y-Licencias.html") &#40;más información aquí&#41;
             div!=License
             h4 Categoría: #{CategoríaPost}
-        div.card.card-body.bg-light!= PostContent
+        div.card.card-body.bg-light#ContenidoPost!= PostContent
         - if (UrlImagen !="/Medios/null")
-            img.img-thumbnail(src=`${UrlImagen}`, alt=`Imagen del post #${PostNumber}`)
+            div.card.card-body.bg-warning
+                h4#DatosImagen Imagen original:&nbsp;
+                    a(href=`${UrlImagen}`) #{UrlImagen}
+                    |&nbsp;| #{MimeImagen}, #{FileSize};
+            hr
+            canvas#Lienzo
             br
         - else
             p.card.card-header.bg-warning No hay imágenes.
         div.card.card-body#full-stars-example
-            - if (IdUsuarioConectado != "NULL" && PermitirVoto)
+            - if (IdUsuarioConectado != null && PermitirVoto)
                 form(action="/Posts/Votar", method="post")
                     input(type="hidden" name="PostId" value=`${PostNumber}`)
                     div.rating-group
@@ -90,7 +83,7 @@ html(lang="es")
                       input#rating-5.rating__input(name='rating' value='5' type='radio')
                     br
                     button(type="submit").btn.btn-info Votar
-            - else if (IdUsuarioConectado != "NULL" && !PermitirVoto && !AutoVoto)
+            - else if (IdUsuarioConectado != null && !PermitirVoto && !AutoVoto)
                 h4 Ya has votado éste post.
             - else if (AutoVoto)
                 h4 No puedes votar tu propia subida.
@@ -100,7 +93,7 @@ html(lang="es")
                 h4 No hay votos
             - else
                 h4 Puntuación: #{PuntuaciónPost} de 5 &#40;Votos: #{VotosPost}&#41;
-        - if (IdUsuarioConectado != "NULL")
+        - if (IdUsuarioConectado != null)
             div.card.text-center.bg-light.card-header
                 form(action="/Comentarios/Nuevo", method="post")
                     h4 Añadir comentario como #{UsuarioConectado}
@@ -114,7 +107,7 @@ html(lang="es")
             div.card.bg-info.card-header
                 h3 Comentarios: #{Comentarios.length}
                 each Comentario in Comentarios
-                    div.card.card-header.bg-success
+                    div.card.card-header.bg-success.TituloComentario
                         h4
                             - if (Comentario ["NumeroOP"] == OP_ID)
                                 a(href=`/Usuario/Perfil/${Comentario["NumeroOP"]}`) #{Comentario["NombreOP"]}
@@ -123,17 +116,19 @@ html(lang="es")
                                 a(href=`/Usuario/Perfil/${Comentario["NumeroOP"]}`) #{Comentario["NombreOP"]}
                                 |, el #{Comentario["FechaSubida"]}&nbsp;
                             - if (RolUsuario == "Admin")
-                                a(href=`/Comentarios/Borrar/${Comentario["NumeroComentario"]}`)
-                                    button.btn.btn-danger Borrar
-                    div.card.card-body!=Comentario["TextoComentario"]
+                                div.float-end
+                                    a(href=`/Comentarios/Borrar/${Comentario["NumeroComentario"]}`)
+                                        button.btn.btn-danger Borrar
+                    div.card.card-body.ContenidoComentario!=Comentario["TextoComentario"]
         - else
             div.card.bg-info.card-header
                 h3 No hay comentarios
 
         - if (RolUsuario == "Admin")
-            a(href=`/Posts/Borrar/${PostNumber}`)
-                button.btn.btn-danger
-                    h4 Borrar post
+            div.text-center
+                a(href=`/Posts/Borrar/${PostNumber}`)
+                    button.btn.btn-danger
+                        h4 Borrar post
         div.card.bg-light.card-body
             h3
                 a(href="/") Página principal

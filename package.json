@@ -1,6 +1,6 @@
 {
   "name": "fotaza",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -14,8 +14,10 @@
     "cookie-parser": "^1.4.6",
     "express": "^4.18.2",
     "formidable": "^3.5.0",
+    "image-thumbnail": "^1.0.15",
     "jsonwebtoken": "^9.0.1",
     "marked": "^10.0.0",
+    "mime-types": "^2.1.35",
     "mysql2": "^3.5.1",
     "pug": "^3.0.2",
     "sanitize-html": "^2.11.0",

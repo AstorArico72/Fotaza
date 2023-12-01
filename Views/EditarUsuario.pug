@@ -15,7 +15,7 @@ html(lang="es")
                         li.nav-item
                             h2
                                 a.nav-link.text-dark(href="/Posts") Fotaza
-                        - if (IdUsuarioConectado == "NULL")
+                        - if (IdUsuarioConectado == null)
                             li.nav-item
                                 button.btn.btn-primary
                                     a.nav-link.text-light(href="/Usuario/Ingresar") Iniciar Sesión

@@ -10,8 +10,8 @@ const path = require ("path");
 
 const OpcionesArchivo = {
     dotfiles: "ignore",
-    extensions: ["jpeg", "jpg", "bmp", "png", "svg"],
-    mime: ["image/jpeg", "image/bmp", "image/png", "image/svg"]
+    extensions: ["jpeg", "jpg", "bmp", "png", "svg", "gif"],
+    mime: ["image/jpeg", "image/bmp", "image/png", "image/svg", "image/gif"]
 }
 const OpcionesDoc = {
     dotfiles: "ignore",
