@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Preguntas frecuentes - Fotaza</title>
+    <link rel="stylesheet" href="/CSS" type="Text/CSS"/>
+    <link rel="icon" type="image/x-icon" href="/favicon"/>
+</head>
+<body>
+    <div class="card card-header bg-info">
+        <h1>Preguntas Frecuentes</h1>
+    </div>
+    <div class="card card-body">
+        <p>
+            <ul class="list-group">
+                <li class="list-item">
+                    <h4>¿Qué puede subirse a Fotaza.net?</h4>
+                    La respuesta está en nuestros <a href="/Documentos/Términos-de-uso-y-Licencias.html"> términos de uso.</a>
+                </li>
+                <li class="list-item">
+                    <h4>¿Cómo darle formato a los posts?</h4>
+                    Con la sintaxis Markdown, la guía está <a href="/Documentos/Guía-de-Markdown-y-formato.html"> aquí.</a>
+                </li>
+                <li class="list-item">
+                    <h4>¿Qué tipos de archivos son admitidos?</h4>
+                    PNG, JPEG, BMP, GIF, y SVG, siempre y cuando no sea más grande que <abbr title="Megabytes binarios, también llamados mebibytes. 10 MiB = 10,485,760 B.">10 MiB.</abbr>
+                </li>
+                <li class="list-item">
+                    <h4>¿Se admite subir videos?</h4>
+                    No. El espacio del disco duro es caro, y todo éste sitio está corriendo en una sola laptop. Pero sí es posible enlazar videos de otras páginas.
+                </li>
+                <li class="list-item">
+                    <h4>¿Son los nombres únicos?</h4>
+                    Sí. Sólo puede haber una cuenta por nombre. Normalmente habrá un aviso si el nombre de usuario de la nueva cuenta está tomado.
+                </li>
+                <li class="list-item">
+                    <h4>¿Cómo hago que mi post llegue a los Destacados?</h4>
+                    No es posible ayudarte con éso. Es necesario que la subida tenga al menos una calificación de 4/5 y 50 votos. Una vez conseguido éso, el post se quedará ahí hasta que haya pasado una semana desde que se subió.
+                </li>
+                <li class="list-item">
+                    <h4>¿Es posible hacer un sitio similar?</h4>
+                    Sí. Fotaza.net es software libre bajo la <a href="/Documentos/LICENCIA.txt">GPL V3.</a> A resumidas cuentas, es posible hacer un derivado siempre y cuando se redistribuya bajo los mismos términos.
+                </li>
+                <li class="list-item">
+                    <h4>¿Es posible contribuir al código del sitio?</h4>
+                    Sí. Ve al <a href="https://github.com/AstorArico72/Fotaza">repositorio de GitHub</a> para contribuir o incluso hacer un trabajo parecido.
+                </li>
+                <li class="list-item">
+                    <h4>¿Con qué está hecho éste sitio?</h4>
+                    Para el servidor, éste sitio usa: <a href="https://nodejs.org/">Node.js</a> 18.18.2 y <a href="https://www.expressjs.com">Express.js</a> 4.18.2.
+                    <li class="list-inline-item"> <a href="https://mariadb.org/">MariaDB</a> para la base de datos.</li>
+                    <li class="list-inline-item"> Éste sitio corre en una pila <a href="https://www.apachefriends.org/">LAMP/XAMPP.</a></li>
+                    <li class="list-inline-item">Excepto ExpressJS, ninguno de los programas anteriores está incluido en el paquete. </li>
+                    El paquete incluye:
+                    <li class="list-inline-item"> El cliente <a href="https://github.com/sidorares/node-mysql2">node-mysql2 de sidorares</a> 3.5.1 para interactuar con la base de datos.</li>
+                    <li class="list-inline-item"> El ORM <a href="https://sequelize.org/">Sequelize</a> 6.32.1 para interactuar con la base de datos.</li>
+                    <li class="list-inline-item"> <a href="https://github.com/kelektiv/node.bcrypt.js">BCrypt</a> 5.1 para el "salteado" de contraseñas.</li>
+                    <li class="list-inline-item"> <a href="https://github.com/auth0/node-jsonwebtoken">JSONWebToken de Auth0</a> 9.0.1 para generar y firmar "cookies" estrictamente funcionales.</li>
+                    <li class="list-inline-item"> <a href="https://github.com/expressjs/cookie-parser">Cookie-parser de ExpressJS</a> 1.4.6 para manejar las "cookies".</li>
+                    <li class="list-inline-item"> <a href="https://github.com/node-formidable/formidable">Node-formidable</a> 3.5.0 para manejar los archivos entrantes.</li>
+                    <li class="list-inline-item"> <a href="https://github.com/onildoaguiar/image-thumbnail">Image-thumbnail de onildoaguiar</a> 1.0.15 para generar miniaturas.</li>
+                    <li class="list-inline-item"> <a href="https://marked.js.org/">Marked</a> 10.0 para interpretar texto Markdown.</li>
+                    <li class="list-inline-item"> <a href="https://github.com/apostrophecms/sanitize-html">Sanitize-html de ApostropheCMS</a> 2.11 para prevenir ataques XSS.</li>
+                    <li class="list-inline-item"> <a href="https://pugjs.org">Pug</a> 3.0.2 para presentar las páginas dinámicamente.</li>
+                    <li class="list-inline-item">Todos ésos programas excepto MariaDB están bajo la licencia MIT.</li>
+                </li>
+            </ul>
+        </p>
+    </div>
+</body>
+</html>
