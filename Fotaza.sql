@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: localhost
--- Tiempo de generación: 18-11-2023 a las 19:03:41
+-- Tiempo de generación: 21-12-2023 a las 00:26:10
 -- Versión del servidor: 10.4.21-MariaDB
 -- Versión de PHP: 8.0.10
 
@@ -32,8 +32,8 @@ CREATE TABLE `Comentarios` (
   `ID_Post` int(11) NOT NULL,
   `ID_Usuario` int(11) NOT NULL,
   `Texto_Comentario` varchar(20000) COLLATE utf8_bin NOT NULL,
-  `createdAt` date NOT NULL,
-  `updatedAt` date NOT NULL
+  `createdAt` datetime NOT NULL,
+  `updatedAt` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- --------------------------------------------------------
@@ -48,20 +48,14 @@ CREATE TABLE `Posts` (
   `Texto_Post` varchar(20000) COLLATE utf8_bin NOT NULL,
   `Título_Post` varchar(255) COLLATE utf8_bin NOT NULL,
   `URL_Medios` varchar(255) COLLATE utf8_bin DEFAULT NULL,
-  `Etiquetas_Post` varchar(1000) COLLATE utf8_bin DEFAULT NULL,
+  `URL_Miniatura` varchar(255) COLLATE utf8_bin DEFAULT NULL,
+  `Etiquetas_Post` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   `Licencia_Foto` varchar(32) COLLATE utf8_bin DEFAULT NULL,
   `Categoría_Post` varchar(32) COLLATE utf8_bin DEFAULT NULL,
   `Visibilidad` varchar(10) COLLATE utf8_bin NOT NULL DEFAULT 'Público',
-  `createdAt` date DEFAULT current_timestamp() COMMENT 'De momento es necesario para operar con Sequelize ORM',
-  `updatedAt` date DEFAULT current_timestamp() COMMENT 'De momento es necesario para operar con Sequelize ORM'
+  `createdAt` datetime DEFAULT current_timestamp() COMMENT 'De momento es necesario para operar con Sequelize ORM',
+  `updatedAt` datetime DEFAULT current_timestamp() COMMENT 'De momento es necesario para operar con Sequelize ORM'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-
---
--- Volcado de datos para la tabla `Posts`
---
-
-INSERT INTO `Posts` (`id`, `Usuario`, `Texto_Post`, `Título_Post`, `URL_Medios`, `Etiquetas_Post`, `Licencia_Foto`, `Categoría_Post`, `Visibilidad`, `createdAt`, `updatedAt`) VALUES
-(1, 1, '<h1>¡Bienvenido!</h1>\r\n<p>\r\nÉste es el proyecto final para Laboratorio de Programación II. <br>\r\nAntes de comenzar a usar Fotaza, lee los términos de uso, y la guía de HTML y formato. <br>\r\nÉste trabajo no está bajo ninguna licencia, por lo que se pide que no sea publicado.\r\n</p>', 'Bienvenido a Fotaza', NULL, 'Modpost', 'CC-BY-NC-ND', NULL, 'Público', '2023-11-18', '2023-11-18');
 
 -- --------------------------------------------------------
 
@@ -79,13 +73,6 @@ CREATE TABLE `Usuarios` (
   `updatedAt` date NOT NULL DEFAULT current_timestamp() COMMENT 'De momento es necesario para operar con Sequelize ORM'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
---
--- Volcado de datos para la tabla `Usuarios`
---
-
-INSERT INTO `Usuarios` (`id`, `Nombre_Usuario`, `Contraseña`, `Rol`, `Perfil_Usuario`, `createdAt`, `updatedAt`) VALUES
-(1, 'Admin', '$2b$10$ktLnVpwcsBPl7OztH.F.6emKq/gSx7sMmNFMsT2K9CTFAMigteU0i', 'User', '<h1> Astor Aricó </h1>\r\n<p>\r\nCreador y adminstrador de Fotaza\r\n</p>', '2023-11-18', '2023-11-18');
-
 -- --------------------------------------------------------
 
 --
@@ -100,8 +87,8 @@ CREATE TABLE `Votos` (
   `Votos2` int(11) DEFAULT 0,
   `Votos1` int(11) DEFAULT 0,
   `Votos0` int(11) DEFAULT 0,
-  `createdAt` date DEFAULT NULL,
-  `updatedAt` date DEFAULT NULL
+  `createdAt` datetime DEFAULT NULL,
+  `updatedAt` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- --------------------------------------------------------
@@ -170,13 +157,13 @@ ALTER TABLE `Comentarios`
 -- AUTO_INCREMENT de la tabla `Posts`
 --
 ALTER TABLE `Posts`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `Usuarios`
 --
 ALTER TABLE `Usuarios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- Restricciones para tablas volcadas
