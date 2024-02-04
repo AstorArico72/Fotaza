@@ -1,10 +1,10 @@
 {
   "name": "fotaza",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node Index.js"
+    "start": "node Index.js > ./logs/$(date +%Y-%m-%d-%H:%M:%S).log 2> ./logs/$(date +%Y-%m-%d-%H:%M:%S).log"
   },
   "author": "Astor Aricó",
   "license": "GPL-3.0-only",
@@ -15,6 +15,7 @@
     "express": "^4.18.2",
     "formidable": "^3.5.0",
     "image-thumbnail": "^1.0.15",
+    "jimp": "^0.22.10",
     "jsonwebtoken": "^9.0.1",
     "marked": "^10.0.0",
     "mime-types": "^2.1.35",

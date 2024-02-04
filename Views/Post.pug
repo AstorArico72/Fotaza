@@ -9,27 +9,15 @@ html(lang="es")
         link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css", type="Text/CSS")
         title #{PostTitle} - Fotaza
         link(rel="icon", href="/favicon", type="image/x-icon")
+        script(src="/JQuery")
         script.
-            var UrlFoto = "!{UrlImagen}";
-            var Usuario = "#{OriginalPoster}";
-            window.addEventListener ("load", function () {
-                var DatosImagen = document.getElementById ("DatosImagen");
-                let Lienzo = document.getElementById ("Lienzo");
-                Lienzo.width = window.innerWidth;
-                Lienzo.height = window.innerHeight;
-                let ContextoLienzo = Lienzo.getContext ("2d");
-                let Imagen = new Image ();
-                Imagen.src = UrlFoto;
-                let Escala = Math.min(Lienzo.width / Imagen.width, Lienzo.height / Imagen.height);
-                Imagen.addEventListener ("load", function () {
-                    ContextoLienzo.drawImage (Imagen, 0, 0, Imagen.width * Escala, Imagen.height * Escala);
-                    ContextoLienzo.font = "60px sans-serif";
-                    ContextoLienzo.textBaseline = "middle";
-                    ContextoLienzo.fillStyle = "black";
-                    ContextoLienzo.textAlign = "left"
-                    ContextoLienzo.strokeText ("www.Fotaza.net - Por @" + Usuario, 40, 60);
-                    DatosImagen.innerHTML += " " + Imagen.width + "x" + Imagen.height;
-                });
+            $(document).ready (function () {
+                var Usuario = "#{OriginalPoster}";
+                var Foto = new Image ();
+                Foto.src = $("#ImagenPost").attr ("src");
+                let ancho = Foto.width;
+                let alto = Foto.height;
+                $("#DatosImagen").append ("&nbsp;" + ancho + "x" + alto);
             });
     body
         include Navbar.pug
@@ -50,10 +38,12 @@ html(lang="es")
         - if (UrlImagen !="/Medios/null")
             div.card.card-body.bg-warning
                 h4#DatosImagen Imagen original:&nbsp;
-                    a(href=`${UrlImagen}`) #{UrlImagen}
-                    |&nbsp;| #{MimeImagen}, #{FileSize};
+                    a(href=`${UrlImagen}`) #{UrlImagenTruncada}
+                    |&nbsp;| #{MimeImagen},&nbsp;
+                    abbr(title="KiB: Kilobytes binarios. 1 KiB = 1024 B. \nMiB: Megabytes binarios. 1 MiB = 1024 KiB.")
+                        |#{FileSize};
             hr
-            canvas#Lienzo
+            img#ImagenPost.img-fluid(src=`${UrlImagen}`)
             br
         - else
             p.card.card-header.bg-warning No hay imágenes.

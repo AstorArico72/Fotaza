@@ -8,6 +8,7 @@ const Marked = require ("marked");
 const SanitizeHTML = require ("sanitize-html");
 const TiposMIME = require ("mime-types");
 const ImageThumbnail = require ("image-thumbnail");
+const Jimp = require ("jimp");
 
 const FormatoFecha = {
     hour12: true,
@@ -232,6 +233,7 @@ exports.VerSubida = async (req, res, _next) => {
             License: LicenciaFoto,
             OP_ID: IdAutor,
             UrlImagen: Foto,
+            UrlImagenTruncada: Foto.replace ("/Medios/", ""),
             Etiquetas: TagsPost,
             CategoríaPost: CategoríaPost,
             Comentarios: ListaComentarios,
@@ -517,9 +519,9 @@ exports.NuevoPost = async (req, res) => {
                 let Ahora = new Date ();
                 let NombreArchivo = Ahora.getFullYear () + "-" + (Ahora.getMonth () +1)+ "-" + Ahora.getDate ()+ "-" + Ahora.getHours () + "-" + Ahora.getMinutes () + "-" + Ahora.getSeconds () + "-" + NombreTruncado;
                 NombreArchivoMiniatura = "Thumb-" + NombreArchivo;
-                FS.renameSync (Foto.filepath, Path.join (DirectorioSubida, NombreArchivo));
                 UrlMedios = "/Medios/" + NombreArchivo;
                 UrlMiniatura = "/Medios/" + NombreArchivoMiniatura;
+                FS.renameSync (Foto.filepath, Path.join (DirectorioSubida, NombreArchivo));
             }
             
             if (typeof (fields.TagsPost [0]) != "undefined") {
@@ -556,13 +558,14 @@ exports.NuevoPost = async (req, res) => {
                 Visibilidad: Visibilidad_Post
             });
             if (UrlMedios != null) {
-                let BufferFoto = FS.readFileSync (Path.join (DirectorioSubida, "../", UrlMedios));
-                let Miniatura = await ImageThumbnail (BufferFoto, OpcionesMiniatura);
-                FS.writeFile (Path.join (DirectorioSubida, data.NombreArchivoMiniatura), Miniatura, (error)=> {
+                MarcaDeAgua (UrlMedios);
+                let BufferFoto = FS.readFileSync (Path.join (DirectorioSubida, "../", UrlMedios), (error)=> {
                     if (error) {
                         OtrasFunciones.PaginaErrorPug (res, error.httpCode || 500, error);
                     }
                 });
+                let Miniatura = await ImageThumbnail (BufferFoto, OpcionesMiniatura);
+                FS.writeFileSync (Path.join (DirectorioSubida, data.NombreArchivoMiniatura), Miniatura);
             }
         }).then (()=> {
             OtrasFunciones.PaginaErrorPug (res, 201, "Post subido.");
@@ -760,4 +763,16 @@ async function CalcularPuntuación (PostID) {
         Resultado.NumeroVotos = TotalVotos;
     }
     return Resultado;
+}
+
+async function MarcaDeAgua (Camino) {
+    var Foto = await Jimp.read (Path.join (__dirname, "..", Camino));
+    var Sello = await Jimp.read (Path.join (__dirname, "../Medios/Marca-de-agua.png"));
+    Sello.opacity (1);
+    Foto.composite (Sello, 0, 0, {
+        mode: Jimp.BLEND_SOURCE_OVER,
+        opacityDest: 1,
+        opacitySource: 0.33
+    });
+    await Foto.writeAsync (Path.join (__dirname, "..", Camino));
 }

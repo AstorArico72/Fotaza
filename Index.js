@@ -10,8 +10,8 @@ const path = require ("path");
 
 const OpcionesArchivo = {
     dotfiles: "ignore",
-    extensions: ["jpeg", "jpg", "bmp", "png", "svg", "gif"],
-    mime: ["image/jpeg", "image/bmp", "image/png", "image/svg", "image/gif"]
+    extensions: ["jpeg", "jpg", "bmp", "png", "gif"],
+    mime: ["image/jpeg", "image/bmp", "image/png", "image/gif"]
 }
 const OpcionesDoc = {
     dotfiles: "ignore",
@@ -28,6 +28,7 @@ APP.use (Express.urlencoded ());
 APP.use ("/Medios", Express.static ("Medios", OpcionesArchivo));
 APP.use ("/Documentos", Express.static ("Documentos", OpcionesDoc));
 APP.use ("/CSS", Express.static (__dirname + "/Publico/Lumen-Bootswatch.css"));
+APP.use ("/JQuery", Express.static (__dirname + "/Publico/jquery-3.7.1.min.js"));
 APP.use ("/Estrellas", Express.static (__dirname + "/Publico/CSS-estrellas.css"));
 APP.use ('/favicon', Express.static (__dirname + "/Publico/expressjs_logo_icon_169185.ico"));
 APP.use ('/Usuario/Nuevo', Express.static (__dirname + "/Publico/NuevoUsuario.html"));
